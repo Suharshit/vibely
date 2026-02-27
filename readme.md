@@ -1,4 +1,4 @@
-# 📸 Vively
+# 📸 Vibely
 
 > An event-centric photo sharing platform enabling seamless photo uploads and sharing for events without requiring guest accounts.
 
