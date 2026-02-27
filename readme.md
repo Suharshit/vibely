@@ -1,76 +1,178 @@
-# Vibely
+# 📸 Vively
 
-An event-centric photo sharing platform with web and mobile apps.
+> An event-centric photo sharing platform enabling seamless photo uploads and sharing for events without requiring guest accounts.
 
-## Monorepo Structure
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org/)
+[![Expo](https://img.shields.io/badge/Expo-SDK%2050-000020.svg)](https://expo.dev/)
+[![Turborepo](https://img.shields.io/badge/Turborepo-2.0-EF4444.svg)](https://turbo.build/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+## 🌟 Features
+
+- 🎉 **Event Creation** - Create events with custom details and expiration dates
+- 📱 **QR Code Sharing** - Generate shareable QR codes and invite links
+- 📸 **Guest Uploads** - Allow guests to upload photos without creating accounts
+- 🔒 **Personal Vaults** - Save favorite photos before events expire
+- ⚡ **Auto-Cleanup** - Photos automatically delete after event expiration
+- 🌐 **Cross-Platform** - Seamless experience on web and mobile
+
+## 🏗️ Architecture
+
+This is a monorepo containing:
 ```
-events-manager/
+vibely/
 ├── apps/
-│   ├── web/          Next.js 14 web application
-│   └── mobile/       Expo mobile application
+│   ├── web/          # Next.js 14 web application (App Router)
+│   └── mobile/       # Expo React Native mobile app
 └── packages/
-    └── shared/       Shared TypeScript types and validation
+    └── shared/       # Shared TypeScript types, validation, and utilities
 ```
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- **Frontend:** Next.js 14 (App Router), Expo, Tailwind CSS, NativeWind
-- **Backend:** Next.js API Routes, Supabase (Auth + PostgreSQL)
-- **Storage:** Cloudflare R2, ImageKit
-- **Monorepo:** Turborepo with pnpm workspaces
+### Frontend
+- **Web**: Next.js 14 with App Router, Tailwind CSS
+- **Mobile**: Expo (React Native), NativeWind
+- **Language**: TypeScript
 
-## Getting Started
+### Backend & Infrastructure
+- **API**: Next.js API Routes
+- **Database**: PostgreSQL (Supabase)
+- **Authentication**: Supabase Auth (Email + Google OAuth)
+- **Image Storage**: Cloudflare R2
+- **Image Delivery**: ImageKit CDN
+- **Rate Limiting**: Upstash Redis
+- **Cron Jobs**: Vercel Cron
+
+### Development Tools
+- **Monorepo**: Turborepo
+- **Package Manager**: pnpm
+- **Linting**: ESLint
+- **Formatting**: Prettier
+- **Type Checking**: TypeScript
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18.x or higher
+- pnpm 8.x or higher
+- Git
+
+### Installation
+
+1. **Clone the repository**
 ```bash
-# Install dependencies
-pnpm install
-
-# Run development servers
-pnpm dev
-
-# Build all apps
-pnpm build
-
-# Type check everything
-pnpm type-check
-
-# Lint all code
-pnpm lint
+   git clone https://github.com/Suharshit/vibely.git
+   cd vibely
 ```
 
-## Environment Variables
-
-See `.env.example` files in each app directory.
-
-## Project Status
-
-🚧 Currently in Phase 1: Monorepo foundations complete
+2. **Install dependencies**
+```bash
+   pnpm install
 ```
+
+3. **Set up environment variables**
+```bash
+   # Copy example env files
+   cp apps/web/.env.example apps/web/.env.local
+   cp apps/mobile/.env.example apps/mobile/.env
+```
+
+4. **Start development servers**
+```bash
+   pnpm dev
+```
+
+   This starts:
+   - Web app: http://localhost:3000
+   - Mobile app: Expo DevTools
+
+## 📝 Available Scripts
+```bash
+# Development
+pnpm dev          # Start all apps in development mode
+pnpm dev:web      # Start only web app
+pnpm dev:mobile   # Start only mobile app
+
+# Building
+pnpm build        # Build all apps for production
+pnpm build:web    # Build only web app
+pnpm build:mobile # Build only mobile app
+
+# Code Quality
+pnpm lint         # Lint all packages
+pnpm type-check   # Type check all packages
+pnpm format       # Format code with Prettier
+
+# Cleanup
+pnpm clean        # Remove all build artifacts and caches
+```
+
+## 📂 Project Structure
+```
+apps/web/
+├── app/              # Next.js App Router pages
+├── components/       # React components
+├── lib/              # Utilities (Supabase, R2, ImageKit clients)
+└── types/            # TypeScript type definitions
+
+apps/mobile/
+├── screens/          # Mobile screens
+├── components/       # React Native components
+├── navigation/       # Navigation configuration
+└── lib/              # Mobile utilities
+
+packages/shared/
+├── types/            # Shared TypeScript types
+├── validation/       # Zod schemas
+└── constants/        # API constants and configurations
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Commit with conventional commits (`git commit -m 'feat: add amazing feature'`)
+5. Push to your fork (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
+
+## 📋 Roadmap
+
+- [ ] Phase 1: Monorepo setup ✅
+- [ ] Phase 2: Web app foundation
+- [ ] Phase 3: Mobile app foundation
+- [ ] Phase 4: Shared package & types
+- [ ] Phase 5: Integration & verification
+- [ ] Phase 6: Authentication implementation
+- [ ] Phase 7: Event management features
+- [ ] Phase 8: Photo upload & storage
+- [ ] Phase 9: Guest session handling
+- [ ] Phase 10: Personal vault feature
+- [ ] Phase 11: Auto-cleanup cron jobs
+- [ ] Phase 12: Production deployment
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👥 Authors
+
+- **Suharshit** - [GitHub](https://github.com/Suharshit)
+
+## 🙏 Acknowledgments
+
+- Built with [Turborepo](https://turbo.build/)
+- Styled with [Tailwind CSS](https://tailwindcss.com/)
+- Database by [Supabase](https://supabase.com/)
+- Image delivery by [ImageKit](https://imagekit.io/)
 
 ---
 
-## ✅ What We Just Accomplished
-
-Let's recap **Phase 1**:
-
-1. ✅ **Understood monorepos** - Why they exist and their benefits
-2. ✅ **Chose Turborepo** - Understanding why it's right for your project
-3. ✅ **Initialized workspace** - Set up pnpm workspaces
-4. ✅ **Configured Turborepo** - Created the build pipeline
-5. ✅ **Created structure** - Root folders for apps and packages
-6. ✅ **Added Git** - Version control ready
-
----
-
-## 📁 Your Current Structure
-```
-events-manager/
-├── .git/
-├── .gitignore
-├── node_modules/
-├── apps/                    (empty, ready for Phase 2)
-├── packages/                (empty, ready for Phase 4)
-├── package.json
-├── pnpm-lock.yaml
-├── pnpm-workspace.yaml
-├── turbo.json
-└── README.md
+<p align="center">Made with ❤️ for seamless event photo sharing</p>

@@ -52,3 +52,32 @@ Thumbs.db
 # Misc
 *.log
 *.tsbuildinfo
+
+# Environment files (more specific)
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Package manager specific
+.pnpm-store/
+.yarn/
+.yarnrc.yml
+
+# Testing
+.jest/
+coverage/
+*.coverage
+
+# Build info
+.next/build-manifest.json
+.next/routes-manifest.json
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Editor directories and files
+.fleet/
+*.sublime-workspace
+*.sublime-project

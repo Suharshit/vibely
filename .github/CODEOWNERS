@@ -1,0 +1,18 @@
+# Default owner for everything
+* @Suharshit
+
+# Web app
+/apps/web/ @Suharshit
+
+# Mobile app
+/apps/mobile/ @Suharshit
+
+# Shared package
+/packages/shared/ @Suharshit
+
+# CI/CD
+/.github/ @Suharshit
+
+# Documentation
+/docs/ @Suharshit
+/*.md @Suharshit
