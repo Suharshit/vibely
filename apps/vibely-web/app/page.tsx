@@ -9,7 +9,7 @@ export default function HomePage() {
           Event-centric photo sharing platform
         </p>
         <div className="flex gap-4 justify-center">
-          <div className="px-6 py-3 bg-brand-500 text-white rounded-lg font-medium">
+          <div className="px-6 py-3 border-2 border-brand-500 text-brand-500 rounded-lg font-medium">
             Create Event
           </div>
           <div className="px-6 py-3 border-2 border-brand-500 text-brand-500 rounded-lg font-medium">
