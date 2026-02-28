@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "turbo dev",
     "dev:web": "turbo dev --filter=vibely-web",
-    "dev:mobile": "turbo dev --filter=mobile",
+    "dev:mobile": "turbo dev --filter=vibely-mobile",
     "build": "turbo build",
     "build:web": "turbo build --filter=vibely-web",
-    "build:mobile": "turbo build --filter=mobile",
+    "build:mobile": "turbo build --filter=vibely-mobile",
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
