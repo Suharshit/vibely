@@ -145,7 +145,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ## 📋 Roadmap
 
-- [ ] Phase 1: Monorepo setup ✅
+- [x] Phase 1: Monorepo setup
 - [ ] Phase 2: Web app foundation
 - [ ] Phase 3: Mobile app foundation
 - [ ] Phase 4: Shared package & types

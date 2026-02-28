@@ -3,9 +3,6 @@ node_modules/
 .pnp
 .pnp.js
 
-# Testing
-coverage/
-
 # Next.js
 .next/
 out/
@@ -26,6 +23,9 @@ dist/
 .env
 .env*.local
 .env.production
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Debug
 npm-debug.log*
@@ -41,9 +41,12 @@ pnpm-debug.log*
 !.vscode/extensions.json
 !.vscode/settings.json
 .idea/
+.fleet/
 *.swp
 *.swo
 *~
+*.sublime-workspace
+*.sublime-project
 
 # OS
 .DS_Store
@@ -52,11 +55,6 @@ Thumbs.db
 # Misc
 *.log
 *.tsbuildinfo
-
-# Environment files (more specific)
-.env.development.local
-.env.test.local
-.env.production.local
 
 # Package manager specific
 .pnpm-store/
@@ -68,16 +66,7 @@ Thumbs.db
 coverage/
 *.coverage
 
-# Build info
-.next/build-manifest.json
-.next/routes-manifest.json
-
 # Temporary files
 *.tmp
 *.temp
 .cache/
-
-# Editor directories and files
-.fleet/
-*.sublime-workspace
-*.sublime-project
