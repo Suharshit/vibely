@@ -6,10 +6,10 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string; userId: string } }
+  { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   try {
-    const { id, userId } = params;
+    const { id, userId } = await params;
     const body = await request.json();
     const { role } = body;
 
@@ -40,10 +40,10 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; userId: string } }
+  { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   try {
-    const { id, userId } = params;
+    const { id, userId } = await params;
 
     // TODO: Implement remove member
     // 1. Verify authentication
