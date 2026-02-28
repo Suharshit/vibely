@@ -1,6 +1,6 @@
-# Contributing to Events Image Manager
+# Contributing to Vibely
 
-Thank you for considering contributing to Events Image Manager! This document outlines the process and guidelines.
+Thank you for considering contributing to Vibely! This document outlines the process and guidelines.
 
 ## 🌟 How Can I Contribute?
 
@@ -73,11 +73,11 @@ refactor(shared): simplify validation schemas
 ### Setup Steps
 ```bash
 # 1. Clone your fork
-git clone https://github.com/YOUR_USERNAME/events-manager.git
-cd events-manager
+git clone https://github.com/YOUR_USERNAME/vibely.git
+cd vibely
 
 # 2. Add upstream remote
-git remote add upstream https://github.com/ORIGINAL_OWNER/events-manager.git
+git remote add upstream https://github.com/Suharshit/vibely.git
 
 # 3. Install dependencies
 pnpm install
@@ -112,7 +112,7 @@ pnpm build
 
 ## 📁 Project Structure
 ```
-events-manager/
+vibely/
 ├── apps/
 │   ├── web/          # Next.js web app
 │   └── mobile/       # Expo mobile app

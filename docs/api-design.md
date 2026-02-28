@@ -2,7 +2,7 @@
 
 ## Base URL
 
-- **Production**: `https://events-manager.vercel.app/api`
+- **Production**: `https://vibely.vercel.app/api`
 - **Development**: `http://localhost:3000/api`
 
 ## Authentication

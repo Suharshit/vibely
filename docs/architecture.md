@@ -36,7 +36,7 @@
 
 ## Monorepo Structure
 ```
-events-manager/
+vibely/
 ├── apps/
 │   ├── web/              # Next.js 14 web application
 │   │   ├── app/          # App Router pages & API routes
