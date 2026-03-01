@@ -31,10 +31,10 @@ export const PHOTO_CONSTRAINTS = {
 /**
  * Validate file constraints (runtime check)
  */
-export function validatePhotoFile(file: {
-  size: number;
-  type: string;
-}): { valid: boolean; error?: string } {
+export function validatePhotoFile(file: { size: number; type: string }): {
+  valid: boolean;
+  error?: string;
+} {
   if (file.size > PHOTO_CONSTRAINTS.MAX_FILE_SIZE) {
     return {
       valid: false,

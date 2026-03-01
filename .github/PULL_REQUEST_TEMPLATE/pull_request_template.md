@@ -40,9 +40,9 @@ Describe the tests you ran and how to reproduce them.
 
 ### Test Configuration
 
-- **Node version**: 
-- **OS**: 
-- **Browser** (if web): 
+- **Node version**:
+- **OS**:
+- **Browser** (if web):
 
 ## 📸 Screenshots/Videos
 

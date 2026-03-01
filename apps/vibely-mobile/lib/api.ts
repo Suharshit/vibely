@@ -15,13 +15,10 @@ class ApiClient {
   /**
    * Make authenticated request
    */
-  async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     try {
       const url = `${this.baseUrl}${endpoint}`;
-      
+
       // TODO: Add authentication token from storage
       const headers = {
         "Content-Type": "application/json",
@@ -85,7 +82,7 @@ class ApiClient {
   async uploadFile<T>(endpoint: string, formData: FormData): Promise<T> {
     try {
       const url = `${this.baseUrl}${endpoint}`;
-      
+
       // TODO: Add authentication token
       const response = await fetch(url, {
         method: "POST",

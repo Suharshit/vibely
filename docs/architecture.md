@@ -1,6 +1,7 @@
 # Architecture Overview
 
 ## System Design
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                         Client Layer                          │
@@ -35,6 +36,7 @@
 ```
 
 ## Monorepo Structure
+
 ```
 vibely/
 ├── apps/
@@ -60,6 +62,7 @@ vibely/
 ## Data Flow
 
 ### Photo Upload Flow
+
 ```
 1. User/Guest uploads photo
    ↓
@@ -79,6 +82,7 @@ vibely/
 ```
 
 ### Event Expiration Flow
+
 ```
 1. Vercel Cron triggers daily
    ↓
@@ -96,11 +100,13 @@ vibely/
 ## Authentication Flow
 
 ### Registered Users
+
 ```
 User → Supabase Auth → JWT Token → API Routes
 ```
 
 ### Guest Users
+
 ```
 Guest → Generate session token → Store in Supabase → API Routes
 ```
@@ -116,36 +122,42 @@ Guest → Generate session token → Store in Supabase → API Routes
 ## Technology Decisions
 
 ### Why Next.js 14?
+
 - Server Components for performance
 - App Router for modern patterns
 - API routes for backend
 - Vercel deployment integration
 
 ### Why Expo?
+
 - Cross-platform (iOS + Android)
 - OTA updates
 - Great developer experience
 - Large ecosystem
 
 ### Why Turborepo?
+
 - Fast builds with caching
 - Simple configuration
 - Vercel integration
 - Great DX
 
 ### Why Supabase?
+
 - PostgreSQL (reliable, powerful)
 - Built-in auth
 - Real-time subscriptions
 - Good free tier
 
 ### Why Cloudflare R2?
+
 - S3-compatible API
 - No egress fees
 - Fast global delivery
 - Cost-effective
 
 ### Why ImageKit?
+
 - Automatic optimization
 - On-the-fly transformations
 - CDN delivery

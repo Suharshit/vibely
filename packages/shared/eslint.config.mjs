@@ -10,6 +10,10 @@ export default tseslint.config(
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: "module",
+      parser: tseslint.parser,
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     rules: {
       "@typescript-eslint/no-explicit-any": "off",

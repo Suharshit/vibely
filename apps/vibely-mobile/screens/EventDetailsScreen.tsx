@@ -43,12 +43,8 @@ export default function EventDetailsScreen({ route }: any) {
           <Text className="text-base text-gray-700 mb-2">
             📅 Event Date: TBD
           </Text>
-          <Text className="text-base text-gray-700 mb-2">
-            📸 Photos: 0
-          </Text>
-          <Text className="text-base text-gray-700">
-            👥 Members: 1 (host)
-          </Text>
+          <Text className="text-base text-gray-700 mb-2">📸 Photos: 0</Text>
+          <Text className="text-base text-gray-700">👥 Members: 1 (host)</Text>
         </View>
 
         {/* Implementation Note */}

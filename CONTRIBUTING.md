@@ -34,6 +34,7 @@ Enhancement suggestions are tracked as GitHub issues. Provide:
 ## 📝 Commit Message Convention
 
 We follow [Conventional Commits](https://www.conventionalcommits.org/):
+
 ```
 <type>(<scope>): <subject>
 
@@ -55,6 +56,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `ci`: CI/CD changes
 
 ### Examples
+
 ```bash
 feat(web): add event creation form
 fix(mobile): resolve QR scanner crash on iOS
@@ -71,6 +73,7 @@ refactor(shared): simplify validation schemas
 - Git
 
 ### Setup Steps
+
 ```bash
 # 1. Clone your fork
 git clone https://github.com/YOUR_USERNAME/vibely.git
@@ -99,6 +102,7 @@ git push origin feature/my-feature
 ## 🧪 Testing
 
 Before submitting a PR:
+
 ```bash
 # Type check all packages
 pnpm type-check
@@ -111,6 +115,7 @@ pnpm build
 ```
 
 ## 📁 Project Structure
+
 ```
 vibely/
 ├── apps/

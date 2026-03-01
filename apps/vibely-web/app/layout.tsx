@@ -6,7 +6,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Vibely - Event Photo Sharing",
-  description: "Event-centric photo sharing platform for seamless event photography",
+  description:
+    "Event-centric photo sharing platform for seamless event photography",
   keywords: ["events", "photos", "sharing", "QR code", "upload", "vibely"],
   authors: [{ name: "Your Name" }],
   openGraph: {
@@ -24,9 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <main className="min-h-screen bg-gray-50">
-          {children}
-        </main>
+        <main className="min-h-screen bg-gray-50">{children}</main>
       </body>
     </html>
   );

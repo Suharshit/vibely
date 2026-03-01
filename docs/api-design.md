@@ -10,11 +10,13 @@
 ### Methods
 
 1. **JWT Token** (Registered users)
+
 ```
    Authorization: Bearer <token>
 ```
 
 2. **Guest Session Token** (Guest uploads)
+
 ```
    X-Guest-Token: <session_token>
 ```
@@ -24,9 +26,11 @@
 ### Authentication
 
 #### POST /api/auth/signup
+
 Create new user account.
 
 **Request:**
+
 ```json
 {
   "email": "user@example.com",
@@ -36,6 +40,7 @@ Create new user account.
 ```
 
 **Response:**
+
 ```json
 {
   "user": {
@@ -51,9 +56,11 @@ Create new user account.
 ```
 
 #### POST /api/auth/login
+
 Login existing user.
 
 **Request:**
+
 ```json
 {
   "email": "user@example.com",
@@ -62,12 +69,15 @@ Login existing user.
 ```
 
 #### POST /api/auth/google
+
 OAuth login with Google.
 
 #### POST /api/auth/logout
+
 Logout current user.
 
 #### POST /api/auth/refresh
+
 Refresh access token.
 
 ---
@@ -75,11 +85,13 @@ Refresh access token.
 ### Events
 
 #### POST /api/events
+
 Create new event.
 
 **Auth Required**: Yes
 
 **Request:**
+
 ```json
 {
   "title": "Wedding Reception",
@@ -91,6 +103,7 @@ Create new event.
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid",
@@ -102,30 +115,36 @@ Create new event.
 ```
 
 #### GET /api/events/:id
+
 Get event details.
 
 **Auth**: Optional (public with invite token)
 
 #### PATCH /api/events/:id
+
 Update event details.
 
 **Auth Required**: Yes (host only)
 
 #### DELETE /api/events/:id
+
 Delete event.
 
 **Auth Required**: Yes (host only)
 
 #### GET /api/events/:id/gallery
+
 Get all photos for event.
 
 **Auth**: Optional
 
 **Query Params:**
+
 - `page`: number (default: 1)
 - `limit`: number (default: 20)
 
 #### POST /api/events/:id/join
+
 Join event as member.
 
 **Auth Required**: Yes
@@ -135,17 +154,20 @@ Join event as member.
 ### Photos
 
 #### POST /api/photos/upload
+
 Upload photo to event.
 
 **Auth**: User token OR guest token
 
 **Request:**
+
 ```multipart/form-data
 file: <image_file>
 event_id: <uuid>
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid",
@@ -156,11 +178,13 @@ event_id: <uuid>
 ```
 
 #### DELETE /api/photos/:id
+
 Delete photo.
 
 **Auth Required**: Yes (uploader or event host)
 
 #### POST /api/photos/:id/save
+
 Save photo to personal vault.
 
 **Auth Required**: Yes
@@ -170,9 +194,11 @@ Save photo to personal vault.
 ### Guest Sessions
 
 #### POST /api/guest/session
+
 Create guest upload session.
 
 **Request:**
+
 ```json
 {
   "event_id": "uuid",
@@ -182,6 +208,7 @@ Create guest upload session.
 ```
 
 **Response:**
+
 ```json
 {
   "session_token": "guest_token_xyz",
@@ -195,6 +222,7 @@ Create guest upload session.
 ## Error Responses
 
 All errors follow this format:
+
 ```json
 {
   "error": {

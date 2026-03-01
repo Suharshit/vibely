@@ -3,6 +3,7 @@
 ## Branch Strategy
 
 We follow a simplified Git Flow model:
+
 ```
 main (production)
   ↑
@@ -24,6 +25,7 @@ hotfix/* (emergency fixes)
 ## Workflow
 
 ### Starting a New Feature
+
 ```bash
 # 1. Update develop
 git checkout develop
@@ -43,6 +45,7 @@ git push origin feature/my-feature
 ```
 
 ### Fixing a Bug
+
 ```bash
 # 1. Create bugfix branch from develop
 git checkout develop
@@ -58,6 +61,7 @@ git push origin bugfix/fix-description
 ```
 
 ### Hotfix (Emergency)
+
 ```bash
 # 1. Create from main
 git checkout main
@@ -74,6 +78,7 @@ git commit -m "fix: critical security issue"
 ## Commit Message Format
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
 ```
 <type>(<scope>): <subject>
 
@@ -105,6 +110,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `ui`: UI components
 
 ### Examples
+
 ```bash
 feat(web): add event creation form
 fix(mobile): resolve QR scanner crash on iOS
