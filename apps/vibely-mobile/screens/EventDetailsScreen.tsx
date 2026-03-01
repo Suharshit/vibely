@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 
-export default function EventDetailsScreen({ route, navigation }: any) {
+export default function EventDetailsScreen({ route }: any) {
   const { eventId } = route.params || {};
 
   return (

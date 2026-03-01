@@ -34,6 +34,9 @@
   "devDependencies": {
     "@types/react": "~19.2.2",
     "@types/react-native-dotenv": "^0.2.2",
+    "@eslint/js": "^9.39.0",
+    "eslint": "^9.39.0",
+    "typescript-eslint": "^8.16.0",
     "babel-preset-expo": "^55.0.10",
     "tailwindcss": "^3.4.19",
     "typescript": "~5.9.2"

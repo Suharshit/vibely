@@ -72,6 +72,9 @@ importers:
         specifier: 0.7.2
         version: 0.7.2(@babel/core@7.29.0)(react-native@0.83.2)(react@19.2.0)
     devDependencies:
+      '@eslint/js':
+        specifier: ^9.39.0
+        version: 9.39.3
       '@types/react':
         specifier: ~19.2.2
         version: 19.2.14
@@ -81,12 +84,18 @@ importers:
       babel-preset-expo:
         specifier: ^55.0.10
         version: 55.0.10(@babel/core@7.29.0)(@babel/runtime@7.28.6)(expo@55.0.4)(react-refresh@0.14.2)
+      eslint:
+        specifier: ^9.39.0
+        version: 9.39.3
       tailwindcss:
         specifier: ^3.4.19
         version: 3.4.19
       typescript:
         specifier: ~5.9.2
         version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.16.0
+        version: 8.56.1(eslint@9.39.3)(typescript@5.9.3)
 
   apps/vibely-web:
     dependencies:
@@ -134,12 +143,21 @@ importers:
         specifier: ^3.22.4
         version: 3.25.76
     devDependencies:
+      '@eslint/js':
+        specifier: ^9.39.0
+        version: 9.39.3
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.35
+      eslint:
+        specifier: ^9.39.0
+        version: 9.39.3
       typescript:
         specifier: ^5.3.0
         version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.16.0
+        version: 8.56.1(eslint@9.39.3)(typescript@5.9.3)
 
 packages:
 
