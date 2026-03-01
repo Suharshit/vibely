@@ -1,12 +1,17 @@
 import React from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { API_ROUTES } from "@repo/shared/constants";
+import { formatFileSize } from "@repo/shared/utils";
+import { APP_CONFIG } from "@repo/shared/constants";
 
 export default function HomeScreen({ navigation }: any) {
+  const maxFileSize = formatFileSize(APP_CONFIG.PHOTO.MAX_FILE_SIZE);
+
   return (
     <ScrollView className="flex-1 bg-gray-50">
       <View className="p-6 space-y-6">
         {/* Hero Section */}
-        <View className="items-center py-8">
+        <View className="items-center justify-items-center py-8">
           <Text className="text-4xl font-bold text-gray-900 text-center">
             Vibely
           </Text>
@@ -36,10 +41,13 @@ export default function HomeScreen({ navigation }: any) {
         {/* Status Card */}
         <View className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mt-8">
           <Text className="text-sm text-gray-500 text-center">
-            ✅ Phase 3: Mobile app setup complete
+            ✅ Phase 4: Shared package integration complete
           </Text>
           <Text className="text-xs text-gray-400 text-center mt-2">
-            NativeWind configured • Navigation ready
+            Using shared constants: Max file size is {maxFileSize}
+          </Text>
+          <Text className="text-xs text-gray-400 text-center mt-1">
+            API Base: {API_ROUTES.EVENTS.BASE}
           </Text>
         </View>
 
