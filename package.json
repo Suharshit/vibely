@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Event-centric photo sharing platform monorepo",
+  "type": "module",
   "scripts": {
     "dev": "turbo dev",
     "dev:web": "turbo dev --filter=vibely-web",
