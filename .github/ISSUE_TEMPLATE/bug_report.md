@@ -1,9 +1,9 @@
 ---
 name: Bug Report
 about: Report a bug to help us improve
-title: '[BUG] '
+title: "[BUG] "
 labels: bug
-assignees: ''
+assignees: ""
 ---
 
 ## 🐛 Bug Description
@@ -15,7 +15,7 @@ A clear and concise description of the bug.
 - [ ] Web App
 - [ ] Mobile App (iOS/Android)
 - [ ] Shared Package
-- [ ] Other: ___________
+- [ ] Other: \***\*\_\_\_\*\***
 
 ## 🔄 Steps to Reproduce
 

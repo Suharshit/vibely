@@ -1,9 +1,9 @@
 ---
 name: Feature Request
 about: Suggest a new feature or enhancement
-title: '[FEATURE] '
+title: "[FEATURE] "
 labels: enhancement
-assignees: ''
+assignees: ""
 ---
 
 ## 🚀 Feature Description
@@ -28,7 +28,7 @@ What other solutions or features have you considered?
 - [ ] Mobile App
 - [ ] Shared Package
 - [ ] Documentation
-- [ ] Other: ___________
+- [ ] Other: \***\*\_\_\_\*\***
 
 ## 📸 Mockups/Examples
 

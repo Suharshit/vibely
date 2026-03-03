@@ -20,23 +20,27 @@
 ## 🏗️ Architecture
 
 This is a monorepo containing:
+
 ```
 vibely/
 ├── apps/
 │   ├── web/          # Next.js 14 web application (App Router)
 │   └── mobile/       # Expo React Native mobile app
 └── packages/
-    └── shared/       # Shared TypeScript types, validation, and utilities
+    ├── shared/       # Shared TypeScript types, validation, and utilities
+    └── eslint-config/ # Shared ESLint configuration
 ```
 
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **Web**: Next.js 14 with App Router, Tailwind CSS
 - **Mobile**: Expo (React Native), NativeWind
 - **Language**: TypeScript
 
 ### Backend & Infrastructure
+
 - **API**: Next.js API Routes
 - **Database**: PostgreSQL (Supabase)
 - **Authentication**: Supabase Auth (Email + Google OAuth)
@@ -46,6 +50,7 @@ vibely/
 - **Cron Jobs**: Vercel Cron
 
 ### Development Tools
+
 - **Monorepo**: Turborepo
 - **Package Manager**: pnpm
 - **Linting**: ESLint
@@ -63,17 +68,20 @@ vibely/
 ### Installation
 
 1. **Clone the repository**
+
 ```bash
    git clone https://github.com/Suharshit/vibely.git
    cd vibely
 ```
 
 2. **Install dependencies**
+
 ```bash
    pnpm install
 ```
 
 3. **Set up environment variables**
+
 ```bash
    # Copy example env files
    cp apps/web/.env.example apps/web/.env.local
@@ -81,15 +89,18 @@ vibely/
 ```
 
 4. **Start development servers**
+
 ```bash
    pnpm dev
 ```
 
-   This starts:
-   - Web app: http://localhost:3000
-   - Mobile app: Expo DevTools
+This starts:
+
+- Web app: http://localhost:3000
+- Mobile app: Expo DevTools
 
 ## 📝 Available Scripts
+
 ```bash
 # Development
 pnpm dev          # Start all apps in development mode
@@ -111,6 +122,7 @@ pnpm clean        # Remove all build artifacts and caches
 ```
 
 ## 📂 Project Structure
+
 ```
 apps/web/
 ├── app/              # Next.js App Router pages
