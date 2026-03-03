@@ -16,6 +16,7 @@
     "@react-navigation/native": "^7.1.31",
     "@react-navigation/native-stack": "^7.14.2",
     "@repo/shared": "workspace:*",
+    "@supabase/supabase-js": "^2.98.0",
     "expo": "~55.0.4",
     "expo-status-bar": "~55.0.4",
     "nativewind": "^4.2.2",
@@ -32,14 +33,14 @@
     "react-native-worklets": "0.7.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.0",
     "@types/react": "~19.2.2",
     "@types/react-native-dotenv": "^0.2.2",
-    "@eslint/js": "^9.39.0",
-    "eslint": "^9.39.0",
-    "typescript-eslint": "^8.16.0",
     "babel-preset-expo": "^55.0.10",
+    "eslint": "^9.39.0",
     "tailwindcss": "^3.4.19",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "typescript-eslint": "^8.16.0"
   },
   "private": true
 }
