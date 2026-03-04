@@ -1,30 +1,34 @@
-/**
- * Navigation type definitions
- * Defines all routes and their parameters
- */
+// ============================================================
+// apps/mobile/navigation/types.ts
+// ============================================================
+// WHY typed navigation params?
+// React Navigation supports full TypeScript typing for routes
+// and their params. With these types:
+//   • navigation.navigate('Login') autocompletes
+//   • navigation.navigate('EventDetail') without the required
+//     eventId param causes a TypeScript error at compile time
+//   • route.params.eventId is fully typed — no casting needed
+//
+// The pattern: each navigator gets its own ParamList type.
+// Screens with no params use 'undefined'. Screens with params
+// define them as an object.
+// ============================================================
 
-export type RootStackParamList = {
-  // Auth Stack
-  Welcome: undefined;
-  Login: undefined;
+export type AuthStackParamList = {
+  Login: undefined; // No params needed
   Signup: undefined;
+};
 
-  // Main Stack
-  Home: undefined;
-  EventDetails: { eventId: string };
-  EventGallery: { eventId: string };
-  PhotoUpload: { eventId: string };
-  GuestSession: { eventId: string; inviteToken: string };
+export type AppStackParamList = {
+  Dashboard: undefined;
+  EventDetail: { eventId: string }; // Phase 8
+  EventCreate: undefined; // Phase 8
+  GuestUpload: { token: string }; // Phase 10
+  Vault: undefined; // Phase 11
   Profile: undefined;
-  Vault: undefined;
-
-  // Event Creation
-  CreateEvent: undefined;
-  JoinEvent: undefined;
 };
 
-// Helper type for navigation prop
-export type RootStackScreenProps<T extends keyof RootStackParamList> = {
-  navigation: any; // We'll type this properly later
-  route: { params: RootStackParamList[T] };
-};
+// Combined type for navigation prop typing within screens
+// Usage in a screen:
+//   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList, 'Login'>>();
+export type RootStackParamList = AuthStackParamList & AppStackParamList;
