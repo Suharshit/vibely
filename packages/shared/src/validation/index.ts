@@ -5,6 +5,6 @@
 
 export * from "./auth";
 export * from "./user";
-export * from "./event";
+export * from "./event.schemas";
 export * from "./guest";
 export * from "./photo";

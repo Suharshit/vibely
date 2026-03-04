@@ -181,7 +181,7 @@ BEGIN
     ),
     NEW.email,
     CASE
-      WHEN NEW.app_metadata->>'provider' = 'google' THEN 'google'
+      WHEN NEW.raw_app_meta_data->>'provider' = 'google' THEN 'google'
       ELSE 'email'
     END
   )

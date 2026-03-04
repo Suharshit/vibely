@@ -3,7 +3,7 @@
 // Uses the user's JWT → RLS is enforced
 // ============================================================
 import { createBrowserClient } from "@supabase/ssr";
-import { Database } from "@/../../packages/shared/types/database.types";
+import { Database } from "@repo/supabase/types";
 
 export function createClient() {
   return createBrowserClient<Database>(

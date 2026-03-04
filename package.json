@@ -51,5 +51,9 @@
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"
+  },
+  "dependencies": {
+    "nanoid": "^5.1.6",
+    "zod": "^3.22.4"
   }
 }

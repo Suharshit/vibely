@@ -21,7 +21,9 @@
     "paths": {
       "@/*": ["./*"],
       "@repo/shared": ["../../packages/shared/src"],
-      "@repo/shared/*": ["../../packages/shared/src/*"]
+      "@repo/shared/*": ["../../packages/shared/src/*"],
+      "@shared/*": ["../../packages/shared/src/*"],
+      "@repo/supabase/types": ["../../packages/shared/types/database.types.ts"]
     }
   },
   "include": [

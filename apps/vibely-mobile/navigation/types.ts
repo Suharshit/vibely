@@ -1,30 +1,20 @@
-/**
- * Navigation type definitions
- * Defines all routes and their parameters
- */
+// ============================================================
+// apps/mobile/navigation/types.ts  (updated for Phase 8)
+// ============================================================
 
-export type RootStackParamList = {
-  // Auth Stack
-  Welcome: undefined;
+export type AuthStackParamList = {
   Login: undefined;
   Signup: undefined;
+};
 
-  // Main Stack
-  Home: undefined;
-  EventDetails: { eventId: string };
-  EventGallery: { eventId: string };
-  PhotoUpload: { eventId: string };
-  GuestSession: { eventId: string; inviteToken: string };
+export type AppStackParamList = {
+  Dashboard: undefined;
+  EventDetail: { eventId: string };
+  EventCreate: undefined;
+  JoinEvent: { token?: string };    // token is optional — user can type it
+  GuestUpload: { token: string };   // Phase 10
+  Vault: undefined;                 // Phase 11
   Profile: undefined;
-  Vault: undefined;
-
-  // Event Creation
-  CreateEvent: undefined;
-  JoinEvent: undefined;
 };
 
-// Helper type for navigation prop
-export type RootStackScreenProps<T extends keyof RootStackParamList> = {
-  navigation: any; // We'll type this properly later
-  route: { params: RootStackParamList[T] };
-};
+export type RootStackParamList = AuthStackParamList & AppStackParamList;
