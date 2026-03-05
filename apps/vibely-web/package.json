@@ -13,6 +13,7 @@
     "@repo/shared": "workspace:*",
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.98.0",
+    "browser-image-compression": "^2.0.2",
     "next": "16.1.6",
     "qrcode.react": "^4.2.0",
     "react": "19.2.3",

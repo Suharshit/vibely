@@ -15,11 +15,12 @@
 // so tokens are easier to read and transcribe correctly.
 // ============================================================
 
-import { customAlphabet } from 'nanoid';
+import { customAlphabet } from "nanoid";
 
 // 62-char alphabet: uppercase + lowercase + digits
 // Excludes: 0, O, 1, I, l to avoid visual confusion
-const INVITE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+const INVITE_ALPHABET =
+  "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
 
 // 12-char invite tokens: typed into URLs and QR codes
 export const generateInviteToken = customAlphabet(INVITE_ALPHABET, 12);
@@ -62,19 +63,23 @@ export function relativeTime(date: string | Date): string {
   const diffHours = Math.round(diffMs / (1000 * 60 * 60));
   const diffMins = Math.round(diffMs / (1000 * 60));
 
-  if (Math.abs(diffMins) < 1) return 'just now';
+  if (Math.abs(diffMins) < 1) return "just now";
   if (Math.abs(diffMins) < 60) {
     return diffMins > 0 ? `in ${diffMins}m` : `${-diffMins}m ago`;
   }
   if (Math.abs(diffHours) < 24) {
     return diffHours > 0 ? `in ${diffHours}h` : `${-diffHours}h ago`;
   }
-  if (diffDays === 1) return 'tomorrow';
-  if (diffDays === -1) return 'yesterday';
+  if (diffDays === 1) return "tomorrow";
+  if (diffDays === -1) return "yesterday";
   if (diffDays > 1 && diffDays <= 30) return `in ${diffDays} days`;
   if (diffDays < -1 && diffDays >= -30) return `${-diffDays} days ago`;
 
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 /**
@@ -82,12 +87,12 @@ export function relativeTime(date: string | Date): string {
  * e.g. "Saturday, March 15, 2025 · 7:00 PM"
  */
 export function formatEventDate(date: string | Date): string {
-  return new Date(date).toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
+  return new Date(date).toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
   });
 }

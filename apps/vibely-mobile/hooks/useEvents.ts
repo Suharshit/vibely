@@ -20,9 +20,9 @@
 // server. Complex multi-step operations still go through the API.
 // ============================================================
 
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase/client';
-import { generateInviteToken, defaultExpiresAt } from '@shared/utils/invite';
+import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/lib/supabase/client";
+import { generateInviteToken, defaultExpiresAt } from "@shared/utils/invite";
 
 export type EventWithRole = {
   id: string;
@@ -33,10 +33,10 @@ export type EventWithRole = {
   invite_token: string;
   event_date: string;
   expires_at: string;
-  status: 'active' | 'expired' | 'archived';
-  upload_permission: 'open' | 'restricted';
+  status: "active" | "expired" | "archived";
+  upload_permission: "open" | "restricted";
   created_at: string;
-  user_role: 'host' | 'contributor' | 'viewer';
+  user_role: "host" | "contributor" | "viewer";
   host: { id: string; name: string; avatar_url: string | null } | null;
 };
 
@@ -50,12 +50,15 @@ export function useEvents() {
     setError(null);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
 
       const { data, error: queryError } = await supabase
-        .from('event_members')
-        .select(`
+        .from("event_members")
+        .select(
+          `
           role,
           events (
             id, title, description, cover_image_url,
@@ -63,9 +66,10 @@ export function useEvents() {
             status, upload_permission, created_at,
             host:users!host_id ( id, name, avatar_url )
           )
-        `)
-        .eq('user_id', user.id)
-        .order('joined_at', { ascending: false });
+        `
+        )
+        .eq("user_id", user.id)
+        .order("joined_at", { ascending: false });
 
       if (queryError) throw queryError;
 
@@ -78,7 +82,7 @@ export function useEvents() {
 
       setEvents(flattened);
     } catch (err: any) {
-      setError(err?.message ?? 'Failed to load events');
+      setError(err?.message ?? "Failed to load events");
     } finally {
       setIsLoading(false);
     }
@@ -88,79 +92,108 @@ export function useEvents() {
     fetchEvents();
   }, [fetchEvents]);
 
-  const createEvent = useCallback(async (data: {
-    title: string;
-    description?: string | null;
-    event_date: string;
-    upload_permission?: 'open' | 'restricted';
-  }) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return { success: false, error: 'Not authenticated' };
+  const createEvent = useCallback(
+    async (data: {
+      title: string;
+      description?: string | null;
+      event_date: string;
+      upload_permission?: "open" | "restricted";
+    }) => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return { success: false, error: "Not authenticated" };
 
-    const inviteToken = generateInviteToken();
-    const eventDate = new Date(data.event_date);
+      const inviteToken = generateInviteToken();
+      const eventDate = new Date(data.event_date);
 
-    const { data: event, error } = await supabase
-      .from('events')
-      .insert({
-        title: data.title,
-        description: data.description ?? null,
-        host_id: user.id,
-        invite_token: inviteToken,
-        event_date: eventDate.toISOString(),
-        expires_at: defaultExpiresAt(eventDate).toISOString(),
-        upload_permission: data.upload_permission ?? 'open',
-        status: 'active',
-      })
-      .select()
-      .single();
+      const { data: event, error } = await supabase
+        .from("events")
+        .insert({
+          title: data.title,
+          description: data.description ?? null,
+          host_id: user.id,
+          invite_token: inviteToken,
+          event_date: eventDate.toISOString(),
+          expires_at: defaultExpiresAt(eventDate).toISOString(),
+          upload_permission: data.upload_permission ?? "open",
+          status: "active",
+        })
+        .select()
+        .single();
 
-    if (error) return { success: false, error: error.message };
+      if (error) return { success: false, error: error.message };
 
-    await fetchEvents();
-    return { success: true, event };
-  }, [fetchEvents]);
+      await fetchEvents();
+      return { success: true, event };
+    },
+    [fetchEvents]
+  );
 
-  const joinEvent = useCallback(async (token: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return { success: false, error: 'Not authenticated' };
+  const joinEvent = useCallback(
+    async (token: string) => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return { success: false, error: "Not authenticated" };
 
-    // Look up event by token
-    const { data: event, error: lookupError } = await supabase
-      .from('events')
-      .select('id, title, status')
-      .eq('invite_token', token)
-      .single();
+      // Look up event by token
+      const { data: event, error: lookupError } = await supabase
+        .from("events")
+        .select("id, title, status")
+        .eq("invite_token", token)
+        .single();
 
-    if (lookupError || !event) return { success: false, error: 'Invalid invite link' };
-    if (event.status !== 'active') return { success: false, error: 'This event has ended' };
+      if (lookupError || !event)
+        return { success: false, error: "Invalid invite link" };
+      if (event.status !== "active")
+        return { success: false, error: "This event has ended" };
 
-    // Check existing membership
-    const { data: existing } = await supabase
-      .from('event_members')
-      .select('id, role')
-      .eq('event_id', event.id)
-      .eq('user_id', user.id)
-      .single();
+      // Check existing membership
+      const { data: existing } = await supabase
+        .from("event_members")
+        .select("id, role")
+        .eq("event_id", event.id)
+        .eq("user_id", user.id)
+        .single();
 
-    if (existing) return { success: true, event, role: existing.role, alreadyMember: true };
+      if (existing)
+        return {
+          success: true,
+          event,
+          role: existing.role,
+          alreadyMember: true,
+        };
 
-    const { error: joinError } = await supabase
-      .from('event_members')
-      .insert({ event_id: event.id, user_id: user.id, role: 'contributor', is_guest: false });
+      const { error: joinError } = await supabase.from("event_members").insert({
+        event_id: event.id,
+        user_id: user.id,
+        role: "contributor",
+        is_guest: false,
+      });
 
-    if (joinError) return { success: false, error: joinError.message };
+      if (joinError) return { success: false, error: joinError.message };
 
-    await fetchEvents();
-    return { success: true, event, role: 'contributor' };
-  }, [fetchEvents]);
+      await fetchEvents();
+      return { success: true, event, role: "contributor" };
+    },
+    [fetchEvents]
+  );
 
   const deleteEvent = useCallback(async (id: string) => {
-    const { error } = await supabase.from('events').delete().eq('id', id);
+    const { error } = await supabase.from("events").delete().eq("id", id);
     if (error) return { success: false, error: error.message };
-    setEvents(prev => prev.filter(e => e.id !== id));
+    setEvents((prev) => prev.filter((e) => e.id !== id));
     return { success: true };
   }, []);
 
-  return { events, isLoading, error, refetch: fetchEvents, createEvent, joinEvent, deleteEvent };
+  return {
+    events,
+    isLoading,
+    error,
+    refetch: fetchEvents,
+    createEvent,
+    joinEvent,
+    deleteEvent,
+  };
 }

@@ -11,9 +11,9 @@ export type AppStackParamList = {
   Dashboard: undefined;
   EventDetail: { eventId: string };
   EventCreate: undefined;
-  JoinEvent: { token?: string };    // token is optional — user can type it
-  GuestUpload: { token: string };   // Phase 10
-  Vault: undefined;                 // Phase 11
+  JoinEvent: { token?: string }; // token is optional — user can type it
+  GuestUpload: { token: string }; // Phase 10
+  Vault: undefined; // Phase 11
   Profile: undefined;
 };
 
