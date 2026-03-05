@@ -17,8 +17,8 @@
 // Always validate the token even when you have the ID.
 // ============================================================
 
-import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -27,9 +27,12 @@ export async function POST(request: Request, { params }: RouteParams) {
   const supabase = await createClient();
 
   // Auth check
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
   if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // Parse the invite token from the request body
@@ -38,64 +41,77 @@ export async function POST(request: Request, { params }: RouteParams) {
     const body = await request.json();
     token = body.invite_token;
   } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 }
+    );
   }
 
-  if (!token || typeof token !== 'string') {
-    return NextResponse.json({ error: 'invite_token is required' }, { status: 400 });
+  if (!token || typeof token !== "string") {
+    return NextResponse.json(
+      { error: "invite_token is required" },
+      { status: 400 }
+    );
   }
 
   // Verify the event exists, is active, AND the token matches the event ID
   // This prevents a user from using a valid token for event A to join event B
   const { data: event, error: eventError } = await supabase
-    .from('events')
-    .select('id, title, status, invite_token, upload_permission')
-    .eq('id', eventId)
-    .eq('invite_token', token)   // Both conditions must match
+    .from("events")
+    .select("id, title, status, invite_token, upload_permission")
+    .eq("id", eventId)
+    .eq("invite_token", token) // Both conditions must match
     .single();
 
   if (eventError || !event) {
-    return NextResponse.json({ error: 'Invalid or expired invite link' }, { status: 404 });
+    return NextResponse.json(
+      { error: "Invalid or expired invite link" },
+      { status: 404 }
+    );
   }
 
-  if (event.status !== 'active') {
+  if (event.status !== "active") {
     return NextResponse.json(
-      { error: 'This event has ended and is no longer accepting new members' },
+      { error: "This event has ended and is no longer accepting new members" },
       { status: 410 } // 410 Gone — intentional, not 404
     );
   }
 
   // Check existing membership (idempotent — joining twice is fine)
   const { data: existingMember } = await supabase
-    .from('event_members')
-    .select('id, role')
-    .eq('event_id', eventId)
-    .eq('user_id', user.id)
+    .from("event_members")
+    .select("id, role")
+    .eq("event_id", eventId)
+    .eq("user_id", user.id)
     .single();
 
   if (existingMember) {
     // Already a member — return current membership (not an error)
     return NextResponse.json({
-      message: 'Already a member',
+      message: "Already a member",
       event,
       role: existingMember.role,
     });
   }
 
   // Join the event as a contributor
-  const { error: joinError } = await supabase
-    .from('event_members')
-    .insert({
-      event_id: eventId,
-      user_id: user.id,
-      role: 'contributor',
-      is_guest: false,
-    });
+  const { error: joinError } = await supabase.from("event_members").insert({
+    event_id: eventId,
+    user_id: user.id,
+    role: "contributor",
+    is_guest: false,
+  });
 
   if (joinError) {
-    console.error('[POST /api/events/:id/join]', joinError);
-    return NextResponse.json({ error: 'Failed to join event' }, { status: 500 });
+    console.error("[POST /api/events/:id/join]", joinError);
+    return NextResponse.json(
+      { error: "Failed to join event" },
+      { status: 500 }
+    );
   }
 
-  return NextResponse.json({ success: true, event, role: 'contributor' }, { status: 201 });
+  return NextResponse.json(
+    { success: true, event, role: "contributor" },
+    { status: 201 }
+  );
 }

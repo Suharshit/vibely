@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 // ============================================================
 // apps/web/app/join/[token]/page.tsx
@@ -18,11 +18,11 @@
 // login wall first is bad UX.
 // ============================================================
 
-import { use, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext';
-import { formatEventDate } from '@shared/utils/invite';
+import { use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import { formatEventDate } from "@shared/utils/invite";
 
 type PageProps = { params: Promise<{ token: string }> };
 
@@ -47,9 +47,9 @@ export default function JoinEventPage({ params }: PageProps) {
 
   const [event, setEvent] = useState<EventPreview | null>(null);
   const [isLoadingEvent, setIsLoadingEvent] = useState(true);
-  const [eventError, setEventError] = useState('');
+  const [eventError, setEventError] = useState("");
   const [isJoining, setIsJoining] = useState(false);
-  const [joinError, setJoinError] = useState('');
+  const [joinError, setJoinError] = useState("");
 
   // Step 1: load event preview (no auth needed)
   useEffect(() => {
@@ -60,13 +60,13 @@ export default function JoinEventPage({ params }: PageProps) {
         const res = await fetch(`/api/events/by-token/${token}`);
         if (!res.ok) {
           const data = await res.json();
-          setEventError(data.error ?? 'Invalid invite link');
+          setEventError(data.error ?? "Invalid invite link");
           return;
         }
         const data = await res.json();
         setEvent(data.event);
       } catch {
-        setEventError('Failed to load event. Please try again.');
+        setEventError("Failed to load event. Please try again.");
       } finally {
         setIsLoadingEvent(false);
       }
@@ -78,26 +78,26 @@ export default function JoinEventPage({ params }: PageProps) {
   const handleJoin = async () => {
     if (!event) return;
     setIsJoining(true);
-    setJoinError('');
+    setJoinError("");
 
     try {
       const res = await fetch(`/api/events/${event.id}/join`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ invite_token: token }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setJoinError(data.error ?? 'Failed to join event');
+        setJoinError(data.error ?? "Failed to join event");
         return;
       }
 
       // Joined! Redirect to the event page
       router.push(`/events/${event.id}`);
     } catch {
-      setJoinError('Network error. Please try again.');
+      setJoinError("Network error. Please try again.");
     } finally {
       setIsJoining(false);
     }
@@ -118,11 +118,16 @@ export default function JoinEventPage({ params }: PageProps) {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center max-w-sm">
           <div className="text-4xl mb-4">🔗</div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Link not found</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">
+            Link not found
+          </h2>
           <p className="text-sm text-gray-500 mb-6">
-            {eventError || 'This invite link may have expired or been revoked.'}
+            {eventError || "This invite link may have expired or been revoked."}
           </p>
-          <Link href="/" className="text-violet-600 text-sm font-medium hover:underline">
+          <Link
+            href="/"
+            className="text-violet-600 text-sm font-medium hover:underline"
+          >
             Go to homepage
           </Link>
         </div>
@@ -138,33 +143,51 @@ export default function JoinEventPage({ params }: PageProps) {
           {/* Cover */}
           <div className="h-32 bg-linear-to-br from-violet-200 to-pink-100">
             {event.cover_image_url && (
-              <img src={event.cover_image_url} alt={event.title} className="w-full h-full object-cover" />
+              <img
+                src={event.cover_image_url}
+                alt={event.title}
+                className="w-full h-full object-cover"
+              />
             )}
           </div>
 
           <div className="p-6">
             <div className="flex items-center gap-2 mb-1">
               {event.host.avatar_url ? (
-                <img src={event.host.avatar_url} alt="" className="w-5 h-5 rounded-full" />
+                <img
+                  src={event.host.avatar_url}
+                  alt=""
+                  className="w-5 h-5 rounded-full"
+                />
               ) : (
                 <div className="w-5 h-5 rounded-full bg-violet-100 flex items-center justify-center text-xs text-violet-700 font-medium">
                   {event.host.name[0]}
                 </div>
               )}
-              <span className="text-xs text-gray-500">{event.host.name} is inviting you</span>
+              <span className="text-xs text-gray-500">
+                {event.host.name} is inviting you
+              </span>
             </div>
 
-            <h1 className="text-xl font-bold text-gray-900 mt-2">{event.title}</h1>
-            <p className="text-sm text-gray-500 mt-1">{formatEventDate(event.event_date)}</p>
+            <h1 className="text-xl font-bold text-gray-900 mt-2">
+              {event.title}
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              {formatEventDate(event.event_date)}
+            </p>
 
             {event.description && (
-              <p className="mt-3 text-sm text-gray-600 leading-relaxed">{event.description}</p>
+              <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                {event.description}
+              </p>
             )}
 
             <div className="mt-4 flex gap-4 text-xs text-gray-400">
               <span>👥 {event.member_count} members</span>
               <span>
-                {event.upload_permission === 'open' ? '🌐 Anyone can upload' : '🔒 Members only upload'}
+                {event.upload_permission === "open"
+                  ? "🌐 Anyone can upload"
+                  : "🔒 Members only upload"}
               </span>
             </div>
           </div>
@@ -184,12 +207,14 @@ export default function JoinEventPage({ params }: PageProps) {
             disabled={isJoining}
             className="w-full py-3.5 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 transition-colors disabled:opacity-50"
           >
-            {isJoining ? 'Joining…' : `Join "${event.title}"`}
+            {isJoining ? "Joining…" : `Join "${event.title}"`}
           </button>
         ) : (
           // Logged-out user: show auth options
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <h2 className="text-base font-semibold text-gray-900 mb-1">Join this event</h2>
+            <h2 className="text-base font-semibold text-gray-900 mb-1">
+              Join this event
+            </h2>
             <p className="text-sm text-gray-500 mb-4">
               Sign in or create a free account to join and contribute photos.
             </p>
@@ -211,9 +236,12 @@ export default function JoinEventPage({ params }: PageProps) {
 
             <div className="mt-4 pt-4 border-t border-gray-50">
               <p className="text-xs text-gray-400 text-center">
-                Just want to upload photos?{' '}
-                {event.upload_permission === 'open' ? (
-                  <Link href={`/guest/${token}`} className="text-violet-600 font-medium hover:underline">
+                Just want to upload photos?{" "}
+                {event.upload_permission === "open" ? (
+                  <Link
+                    href={`/guest/${token}`}
+                    className="text-violet-600 font-medium hover:underline"
+                  >
                     Continue as guest →
                   </Link>
                 ) : (

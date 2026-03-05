@@ -18,9 +18,9 @@ module.exports = function (api) {
         "module-resolver",
         {
           root: ["./"],
-          alias: { 
-            "@": "./", 
-            '@shared': '../../packages/shared', 
+          alias: {
+            "@": "./",
+            "@shared": "../../packages/shared",
           },
         },
       ],

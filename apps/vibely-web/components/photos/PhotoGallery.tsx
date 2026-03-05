@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-'use client';
+"use client";
 
 // ============================================================
 // apps/web/components/photos/PhotoGallery.tsx
@@ -11,9 +11,9 @@
 //   - Pagination controls
 // ============================================================
 
-import { useState } from 'react';
-import type { GalleryPhoto } from '@/hooks/usePhotos';
-import Image from 'next/image';
+import { useState } from "react";
+import type { GalleryPhoto } from "@/hooks/usePhotos";
+import Image from "next/image";
 
 // ── Photo Card ────────────────────────────────────────────────
 
@@ -25,7 +25,13 @@ interface PhotoCardProps {
   onOpen: (photo: GalleryPhoto) => void;
 }
 
-export function PhotoCard({ photo, onSave, onUnsave, onDelete, onOpen }: PhotoCardProps) {
+export function PhotoCard({
+  photo,
+  onSave,
+  onUnsave,
+  onDelete,
+  onOpen,
+}: PhotoCardProps) {
   const [imgError, setImgError] = useState(false);
   const [src, setSrc] = useState(photo.thumbnail_url);
   const [triedFallback, setTriedFallback] = useState(false);
@@ -57,9 +63,18 @@ export function PhotoCard({ photo, onSave, onUnsave, onDelete, onOpen }: PhotoCa
           className="w-full h-full flex items-center justify-center bg-gray-100"
           onClick={() => onOpen(photo)}
         >
-          <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14" />
+          <svg
+            className="w-8 h-8 text-gray-300"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14"
+            />
           </svg>
         </div>
       )}
@@ -73,16 +88,25 @@ export function PhotoCard({ photo, onSave, onUnsave, onDelete, onOpen }: PhotoCa
               e.stopPropagation();
               photo.saved_by_me ? onUnsave(photo.id) : onSave(photo.id);
             }}
-            title={photo.saved_by_me ? 'Remove from vault' : 'Save to vault'}
+            title={photo.saved_by_me ? "Remove from vault" : "Save to vault"}
             className={`p-1.5 rounded-lg backdrop-blur-sm transition-colors ${
               photo.saved_by_me
-                ? 'bg-amber-400/90 text-white'
-                : 'bg-white/80 text-gray-700 hover:bg-white'
+                ? "bg-amber-400/90 text-white"
+                : "bg-white/80 text-gray-700 hover:bg-white"
             }`}
           >
-            <svg className="w-3.5 h-3.5" fill={photo.saved_by_me ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            <svg
+              className="w-3.5 h-3.5"
+              fill={photo.saved_by_me ? "currentColor" : "none"}
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+              />
             </svg>
           </button>
 
@@ -91,16 +115,25 @@ export function PhotoCard({ photo, onSave, onUnsave, onDelete, onOpen }: PhotoCa
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                if (confirm('Delete this photo? This cannot be undone.')) {
+                if (confirm("Delete this photo? This cannot be undone.")) {
                   onDelete(photo.id);
                 }
               }}
               title="Delete photo"
               className="p-1.5 rounded-lg bg-white/80 text-red-500 hover:bg-white transition-colors backdrop-blur-sm"
             >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
               </svg>
             </button>
           )}
@@ -109,7 +142,9 @@ export function PhotoCard({ photo, onSave, onUnsave, onDelete, onOpen }: PhotoCa
         {/* Uploader name at bottom */}
         {photo.uploader && (
           <div className="absolute bottom-0 left-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <p className="text-xs text-white/90 truncate">{photo.uploader.name}</p>
+            <p className="text-xs text-white/90 truncate">
+              {photo.uploader.name}
+            </p>
           </div>
         )}
       </div>
@@ -122,7 +157,12 @@ export function PhotoCard({ photo, onSave, onUnsave, onDelete, onOpen }: PhotoCa
 interface PhotoGalleryProps {
   photos: GalleryPhoto[];
   isLoading: boolean;
-  pagination: { page: number; total_pages: number; has_next: boolean; has_prev: boolean } | null;
+  pagination: {
+    page: number;
+    total_pages: number;
+    has_next: boolean;
+    has_prev: boolean;
+  } | null;
   onPageChange: (page: number) => void;
   onSave: (id: string) => void;
   onUnsave: (id: string) => void;
@@ -144,7 +184,10 @@ export function PhotoGallery({
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="aspect-square rounded-xl bg-gray-100 animate-pulse" />
+          <div
+            key={i}
+            className="aspect-square rounded-xl bg-gray-100 animate-pulse"
+          />
         ))}
       </div>
     );
@@ -155,7 +198,9 @@ export function PhotoGallery({
       <div className="text-center py-16 border-2 border-dashed border-gray-200 rounded-2xl">
         <div className="text-4xl mb-3">📷</div>
         <p className="text-sm font-medium text-gray-600">No photos yet</p>
-        <p className="text-xs text-gray-400 mt-1">Be the first to upload a photo!</p>
+        <p className="text-xs text-gray-400 mt-1">
+          Be the first to upload a photo!
+        </p>
       </div>
     );
   }
@@ -164,7 +209,7 @@ export function PhotoGallery({
     <>
       {/* Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-        {photos.map(photo => (
+        {photos.map((photo) => (
           <PhotoCard
             key={photo.id}
             photo={photo}
@@ -232,12 +277,12 @@ function Lightbox({ photo, onClose, onSave, onUnsave }: LightboxProps) {
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
       onClick={onClose}
-      onKeyDown={e => e.key === 'Escape' && onClose()}
+      onKeyDown={(e) => e.key === "Escape" && onClose()}
       tabIndex={-1}
     >
       <div
         className="relative max-w-4xl max-h-[90vh] w-full mx-4"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         <Image
           src={src}
@@ -256,16 +301,27 @@ function Lightbox({ photo, onClose, onSave, onUnsave }: LightboxProps) {
         {/* Controls */}
         <div className="absolute top-3 right-3 flex gap-2">
           <button
-            onClick={() => photo.saved_by_me ? onUnsave(photo.id) : onSave(photo.id)}
+            onClick={() =>
+              photo.saved_by_me ? onUnsave(photo.id) : onSave(photo.id)
+            }
             className={`p-2 rounded-xl backdrop-blur-sm transition-colors ${
               photo.saved_by_me
-                ? 'bg-amber-400/90 text-white'
-                : 'bg-white/20 text-white hover:bg-white/30'
+                ? "bg-amber-400/90 text-white"
+                : "bg-white/20 text-white hover:bg-white/30"
             }`}
           >
-            <svg className="w-5 h-5" fill={photo.saved_by_me ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            <svg
+              className="w-5 h-5"
+              fill={photo.saved_by_me ? "currentColor" : "none"}
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+              />
             </svg>
           </button>
 
@@ -273,8 +329,18 @@ function Lightbox({ photo, onClose, onSave, onUnsave }: LightboxProps) {
             onClick={onClose}
             className="p-2 rounded-xl bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -282,9 +348,13 @@ function Lightbox({ photo, onClose, onSave, onUnsave }: LightboxProps) {
         {/* Uploader + filename */}
         <div className="absolute bottom-3 left-3 right-3">
           <div className="bg-black/40 backdrop-blur-sm rounded-xl px-3 py-2">
-            <p className="text-xs text-white/90 truncate">{photo.original_filename}</p>
+            <p className="text-xs text-white/90 truncate">
+              {photo.original_filename}
+            </p>
             {photo.uploader && (
-              <p className="text-xs text-white/60 mt-0.5">by {photo.uploader.name}</p>
+              <p className="text-xs text-white/60 mt-0.5">
+                by {photo.uploader.name}
+              </p>
             )}
           </div>
         </div>

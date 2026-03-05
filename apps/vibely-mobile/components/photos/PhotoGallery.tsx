@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 // ============================================================
 // apps/mobile/components/photos/PhotoGallery.tsx
 // ============================================================
@@ -9,14 +10,23 @@
 // ============================================================
 
 import {
-  View, FlatList, Image, TouchableOpacity,
-  StyleSheet, Dimensions, Modal, ActionSheetIOS,
-  Alert, Platform, ActivityIndicator, Text,
-} from 'react-native';
-import { useState } from 'react';
-import type { GalleryPhoto } from '@/hooks/usePhotos';
+  View,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  Modal,
+  ActionSheetIOS,
+  Alert,
+  Platform,
+  ActivityIndicator,
+  Text,
+} from "react-native";
+import { useState } from "react";
+import type { GalleryPhoto } from "@/hooks/usePhotos";
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
+const SCREEN_WIDTH = Dimensions.get("window").width;
 const COLUMNS = 3;
 const GAP = 2;
 const CELL_SIZE = (SCREEN_WIDTH - GAP * (COLUMNS + 1)) / COLUMNS;
@@ -77,12 +87,7 @@ function PreviewModal({ photo, onClose, onSave, onUnsave }: PreviewModalProps) {
   if (!photo) return null;
 
   return (
-    <Modal
-      visible
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         {/* Close / Save controls */}
         <View style={styles.modalControls}>
@@ -90,7 +95,9 @@ function PreviewModal({ photo, onClose, onSave, onUnsave }: PreviewModalProps) {
             <Text style={styles.modalBtnText}>✕</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => photo.saved_by_me ? onUnsave(photo.id) : onSave(photo.id)}
+            onPress={() =>
+              photo.saved_by_me ? onUnsave(photo.id) : onSave(photo.id)
+            }
             style={[styles.modalBtn, photo.saved_by_me && styles.modalBtnSaved]}
           >
             <Text style={styles.modalBtnText}>🔖</Text>
@@ -129,23 +136,32 @@ interface PhotoGalleryProps {
 }
 
 export function PhotoGallery({
-  photos, isLoading, hasMore,
-  onLoadMore, onSave, onUnsave, onDelete,
+  photos,
+  isLoading,
+  hasMore,
+  onLoadMore,
+  onSave,
+  onUnsave,
+  onDelete,
 }: PhotoGalleryProps) {
   const [previewPhoto, setPreviewPhoto] = useState<GalleryPhoto | null>(null);
 
   const handleLongPress = (photo: GalleryPhoto) => {
     const options = [
-      photo.saved_by_me ? 'Remove from Vault' : 'Save to Vault',
-      ...(photo.is_mine ? ['Delete Photo'] : []),
-      'Cancel',
+      photo.saved_by_me ? "Remove from Vault" : "Save to Vault",
+      ...(photo.is_mine ? ["Delete Photo"] : []),
+      "Cancel",
     ];
     const cancelIndex = options.length - 1;
     const destructiveIndex = photo.is_mine ? 1 : -1;
 
-    if (Platform.OS === 'ios') {
+    if (Platform.OS === "ios") {
       ActionSheetIOS.showActionSheetWithOptions(
-        { options, cancelButtonIndex: cancelIndex, destructiveButtonIndex: destructiveIndex },
+        {
+          options,
+          cancelButtonIndex: cancelIndex,
+          destructiveButtonIndex: destructiveIndex,
+        },
         async (buttonIndex) => {
           if (buttonIndex === 0) {
             photo.saved_by_me ? onUnsave(photo.id) : onSave(photo.id);
@@ -156,31 +172,36 @@ export function PhotoGallery({
       );
     } else {
       // Android: use Alert with buttons
-      Alert.alert(photo.original_filename, 'Choose an action', [
+      Alert.alert(photo.original_filename, "Choose an action", [
         {
-          text: photo.saved_by_me ? 'Remove from Vault' : 'Save to Vault',
-          onPress: () => photo.saved_by_me ? onUnsave(photo.id) : onSave(photo.id),
+          text: photo.saved_by_me ? "Remove from Vault" : "Save to Vault",
+          onPress: () =>
+            photo.saved_by_me ? onUnsave(photo.id) : onSave(photo.id),
         },
-        ...(photo.is_mine ? [{
-          text: 'Delete Photo',
-          style: 'destructive' as const,
-          onPress: () => confirmDelete(photo),
-        }] : []),
-        { text: 'Cancel', style: 'cancel' as const },
+        ...(photo.is_mine
+          ? [
+              {
+                text: "Delete Photo",
+                style: "destructive" as const,
+                onPress: () => confirmDelete(photo),
+              },
+            ]
+          : []),
+        { text: "Cancel", style: "cancel" as const },
       ]);
     }
   };
 
   const confirmDelete = (photo: GalleryPhoto) => {
-    Alert.alert('Delete photo?', 'This cannot be undone.', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert("Delete photo?", "This cannot be undone.", [
+      { text: "Cancel", style: "cancel" },
       {
-        text: 'Delete',
-        style: 'destructive',
+        text: "Delete",
+        style: "destructive",
         onPress: async () => {
           const result = await onDelete(photo.id);
           if (!result.success) {
-            Alert.alert('Error', result.error ?? 'Failed to delete');
+            Alert.alert("Error", result.error ?? "Failed to delete");
           }
         },
       },
@@ -205,9 +226,9 @@ export function PhotoGallery({
     <>
       <FlatList
         data={photos}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         numColumns={COLUMNS}
-        scrollEnabled={false}        // Parent ScrollView handles scrolling
+        scrollEnabled={false} // Parent ScrollView handles scrolling
         renderItem={({ item }) => (
           <PhotoCell
             photo={item}
@@ -243,41 +264,46 @@ const styles = StyleSheet.create({
     width: CELL_SIZE,
     height: CELL_SIZE,
     borderRadius: 6,
-    overflow: 'hidden',
-    backgroundColor: '#f3f4f6',
+    overflow: "hidden",
+    backgroundColor: "#f3f4f6",
   },
-  cellImage: { width: '100%', height: '100%' },
+  cellImage: { width: "100%", height: "100%" },
   savedBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: 4,
     right: 4,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: "rgba(0,0,0,0.5)",
     borderRadius: 10,
     padding: 2,
   },
   savedBadgeText: { fontSize: 10 },
 
-  skeletonGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: GAP, padding: GAP },
-  skeletonCell: { opacity: 0.4, backgroundColor: '#e5e7eb' },
+  skeletonGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: GAP,
+    padding: GAP,
+  },
+  skeletonCell: { opacity: 0.4, backgroundColor: "#e5e7eb" },
 
-  emptyState: { alignItems: 'center', paddingVertical: 48 },
+  emptyState: { alignItems: "center", paddingVertical: 48 },
   emptyIcon: { fontSize: 40, marginBottom: 8 },
-  emptyTitle: { fontSize: 16, fontWeight: '600', color: '#111827' },
-  emptySubtitle: { fontSize: 13, color: '#9ca3af', marginTop: 4 },
+  emptyTitle: { fontSize: 16, fontWeight: "600", color: "#111827" },
+  emptySubtitle: { fontSize: 13, color: "#9ca3af", marginTop: 4 },
 
-  loadMoreIndicator: { padding: 16, alignItems: 'center' },
+  loadMoreIndicator: { padding: 16, alignItems: "center" },
 
   // Modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.92)',
-    justifyContent: 'center',
+    backgroundColor: "rgba(0,0,0,0.92)",
+    justifyContent: "center",
   },
   modalControls: {
-    position: 'absolute',
+    position: "absolute",
     top: 52,
     right: 16,
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
     zIndex: 10,
   },
@@ -285,14 +311,22 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(255,255,255,0.2)",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  modalBtnSaved: { backgroundColor: 'rgba(245,158,11,0.7)' },
-  modalBtnText: { fontSize: 14, color: '#fff' },
+  modalBtnSaved: { backgroundColor: "rgba(245,158,11,0.7)" },
+  modalBtnText: { fontSize: 14, color: "#fff" },
   previewImage: { width: SCREEN_WIDTH, height: SCREEN_WIDTH },
   modalMeta: { padding: 16, paddingTop: 12 },
-  modalMetaText: { fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: '500' },
-  modalMetaSubtext: { fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 },
+  modalMetaText: {
+    fontSize: 13,
+    color: "rgba(255,255,255,0.8)",
+    fontWeight: "500",
+  },
+  modalMetaSubtext: {
+    fontSize: 11,
+    color: "rgba(255,255,255,0.4)",
+    marginTop: 2,
+  },
 });

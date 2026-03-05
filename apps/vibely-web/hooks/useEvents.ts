@@ -15,13 +15,13 @@
 // but without the extra dependency — easy to migrate later.
 // ============================================================
 
-import { useState, useEffect, useCallback } from 'react';
-import type { Tables } from '@repo/supabase/types';
+import { useState, useEffect, useCallback } from "react";
+import type { Tables } from "@repo/supabase/types";
 
 // The event row augmented with the current user's role
-export type EventWithRole = Tables<'events'> & {
-  user_role: 'host' | 'contributor' | 'viewer';
-  host: Pick<Tables<'users'>, 'id' | 'name' | 'avatar_url'>;
+export type EventWithRole = Tables<"events"> & {
+  user_role: "host" | "contributor" | "viewer";
+  host: Pick<Tables<"users">, "id" | "name" | "avatar_url">;
 };
 
 // The full event detail including members
@@ -31,7 +31,7 @@ export type EventDetail = EventWithRole & {
     role: string;
     joined_at: string;
     is_guest: boolean;
-    user: Pick<Tables<'users'>, 'id' | 'name' | 'avatar_url'> | null;
+    user: Pick<Tables<"users">, "id" | "name" | "avatar_url"> | null;
   }>;
 };
 
@@ -40,8 +40,13 @@ interface UseEventsReturn {
   isLoading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
-  createEvent: (data: CreateEventData) => Promise<{ success: boolean; event?: EventWithRole; error?: string }>;
-  updateEvent: (id: string, data: UpdateEventData) => Promise<{ success: boolean; error?: string }>;
+  createEvent: (
+    data: CreateEventData
+  ) => Promise<{ success: boolean; event?: EventWithRole; error?: string }>;
+  updateEvent: (
+    id: string,
+    data: UpdateEventData
+  ) => Promise<{ success: boolean; error?: string }>;
   deleteEvent: (id: string) => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -50,7 +55,7 @@ interface CreateEventData {
   description?: string | null;
   event_date: string;
   expires_at?: string;
-  upload_permission?: 'open' | 'restricted';
+  upload_permission?: "open" | "restricted";
 }
 
 interface UpdateEventData {
@@ -58,8 +63,8 @@ interface UpdateEventData {
   description?: string | null;
   event_date?: string;
   expires_at?: string;
-  upload_permission?: 'open' | 'restricted';
-  status?: 'active' | 'expired' | 'archived';
+  upload_permission?: "open" | "restricted";
+  status?: "active" | "expired" | "archived";
 }
 
 export function useEvents(): UseEventsReturn {
@@ -72,15 +77,15 @@ export function useEvents(): UseEventsReturn {
     setError(null);
 
     try {
-      const res = await fetch('/api/events');
+      const res = await fetch("/api/events");
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error ?? 'Failed to fetch events');
+        throw new Error(data.error ?? "Failed to fetch events");
       }
       const data = await res.json();
       setEvents(data.events ?? []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setIsLoading(false);
     }
@@ -92,51 +97,60 @@ export function useEvents(): UseEventsReturn {
 
   // ── Create ────────────────────────────────────────────────
 
-  const createEvent = useCallback(async (data: CreateEventData) => {
-    try {
-      const res = await fetch('/api/events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+  const createEvent = useCallback(
+    async (data: CreateEventData) => {
+      try {
+        const res = await fetch("/api/events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
 
-      const json = await res.json();
+        const json = await res.json();
 
-      if (!res.ok) {
-        return { success: false, error: json.error ?? 'Failed to create event' };
+        if (!res.ok) {
+          return {
+            success: false,
+            error: json.error ?? "Failed to create event",
+          };
+        }
+
+        // Optimistically prepend to local state, then refetch for accuracy
+        await fetchEvents();
+        return { success: true, event: json.event };
+      } catch {
+        return { success: false, error: "Network error. Please try again." };
       }
-
-      // Optimistically prepend to local state, then refetch for accuracy
-      await fetchEvents();
-      return { success: true, event: json.event };
-    } catch {
-      return { success: false, error: 'Network error. Please try again.' };
-    }
-  }, [fetchEvents]);
+    },
+    [fetchEvents]
+  );
 
   // ── Update ────────────────────────────────────────────────
 
   const updateEvent = useCallback(async (id: string, data: UpdateEventData) => {
     try {
       const res = await fetch(`/api/events/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
       const json = await res.json();
 
       if (!res.ok) {
-        return { success: false, error: json.error ?? 'Failed to update event' };
+        return {
+          success: false,
+          error: json.error ?? "Failed to update event",
+        };
       }
 
       // Update in local state without full refetch for responsiveness
-      setEvents(prev =>
-        prev.map(e => e.id === id ? { ...e, ...json.event } : e)
+      setEvents((prev) =>
+        prev.map((e) => (e.id === id ? { ...e, ...json.event } : e))
       );
       return { success: true };
     } catch {
-      return { success: false, error: 'Network error. Please try again.' };
+      return { success: false, error: "Network error. Please try again." };
     }
   }, []);
 
@@ -144,18 +158,21 @@ export function useEvents(): UseEventsReturn {
 
   const deleteEvent = useCallback(async (id: string) => {
     try {
-      const res = await fetch(`/api/events/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/events/${id}`, { method: "DELETE" });
       const json = await res.json();
 
       if (!res.ok) {
-        return { success: false, error: json.error ?? 'Failed to delete event' };
+        return {
+          success: false,
+          error: json.error ?? "Failed to delete event",
+        };
       }
 
       // Remove immediately from local state
-      setEvents(prev => prev.filter(e => e.id !== id));
+      setEvents((prev) => prev.filter((e) => e.id !== id));
       return { success: true };
     } catch {
-      return { success: false, error: 'Network error. Please try again.' };
+      return { success: false, error: "Network error. Please try again." };
     }
   }, []);
 
@@ -187,13 +204,13 @@ export function useEvent(id: string) {
       const res = await fetch(`/api/events/${id}`);
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error ?? 'Event not found');
+        throw new Error(data.error ?? "Event not found");
       }
       const data = await res.json();
       setEvent(data.event);
       setUserRole(data.user_role);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setIsLoading(false);
     }
@@ -203,21 +220,24 @@ export function useEvent(id: string) {
     fetchEvent();
   }, [fetchEvent]);
 
-  const joinEvent = useCallback(async (token: string) => {
-    try {
-      const res = await fetch(`/api/events/${id}/join`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ invite_token: token }),
-      });
-      const json = await res.json();
-      if (!res.ok) return { success: false, error: json.error };
-      await fetchEvent();
-      return { success: true };
-    } catch {
-      return { success: false, error: 'Network error' };
-    }
-  }, [id, fetchEvent]);
+  const joinEvent = useCallback(
+    async (token: string) => {
+      try {
+        const res = await fetch(`/api/events/${id}/join`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ invite_token: token }),
+        });
+        const json = await res.json();
+        if (!res.ok) return { success: false, error: json.error };
+        await fetchEvent();
+        return { success: true };
+      } catch {
+        return { success: false, error: "Network error" };
+      }
+    },
+    [id, fetchEvent]
+  );
 
   return { event, userRole, isLoading, error, refetch: fetchEvent, joinEvent };
 }

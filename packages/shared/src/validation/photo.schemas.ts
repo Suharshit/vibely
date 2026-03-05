@@ -2,27 +2,29 @@
 // packages/shared/src/validation/photo.schemas.ts
 // ============================================================
 
-import { z } from 'zod';
-import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE_BYTES } from '../utils/storage';
+import { z } from "zod";
+import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE_BYTES } from "../utils/storage";
 
 // ── Upload initiation schema ──────────────────────────────────
 // Sent by client to POST /api/photos/upload to get an upload URL.
 // We validate metadata before accepting the file.
 
 export const uploadInitSchema = z.object({
-  event_id: z.string().uuid('Invalid event ID'),
+  event_id: z.string().uuid("Invalid event ID"),
   filename: z
     .string()
-    .min(1, 'Filename is required')
-    .max(255, 'Filename too long'),
+    .min(1, "Filename is required")
+    .max(255, "Filename too long"),
   content_type: z.enum(ALLOWED_MIME_TYPES, {
-    errorMap: () => ({ message: 'File type not supported. Use JPEG, PNG, WebP, or HEIC.' }),
+    errorMap: () => ({
+      message: "File type not supported. Use JPEG, PNG, WebP, or HEIC.",
+    }),
   }),
   file_size: z
     .number()
     .int()
-    .positive('File size must be positive')
-    .max(MAX_FILE_SIZE_BYTES, 'File must be under 10MB'),
+    .positive("File size must be positive")
+    .max(MAX_FILE_SIZE_BYTES, "File must be under 10MB"),
   // Optional: guest session token for guest uploads
   guest_token: z.string().optional(),
 });

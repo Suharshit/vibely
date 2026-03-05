@@ -11,8 +11,8 @@
 // can't model per-user saves — a dedicated resource is correct REST.
 // ============================================================
 
-import { NextResponse } from 'next/server';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { NextResponse } from "next/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -23,33 +23,35 @@ export async function POST(_req: Request, { params }: RouteParams) {
   const supabase = await createClient();
   const adminSupabase = createAdminClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // Verify photo exists and is active
   const { data: photo } = await adminSupabase
-    .from('photos')
-    .select('id, event_id, status')
-    .eq('id', photoId)
-    .eq('status', 'active')
+    .from("photos")
+    .select("id, event_id, status")
+    .eq("id", photoId)
+    .eq("status", "active")
     .single();
 
   if (!photo) {
-    return NextResponse.json({ error: 'Photo not found' }, { status: 404 });
+    return NextResponse.json({ error: "Photo not found" }, { status: 404 });
   }
 
   // Verify user is a member of the event this photo belongs to
   const { data: membership } = await supabase
-    .from('event_members')
-    .select('id')
-    .eq('event_id', photo.event_id)
-    .eq('user_id', user.id)
+    .from("event_members")
+    .select("id")
+    .eq("event_id", photo.event_id)
+    .eq("user_id", user.id)
     .single();
 
   if (!membership) {
-    return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    return NextResponse.json({ error: "Access denied" }, { status: 403 });
   }
 
   // INSERT ... ON CONFLICT DO NOTHING (idempotent save).
@@ -57,12 +59,15 @@ export async function POST(_req: Request, { params }: RouteParams) {
   // UPDATE RLS policy — upsert()'s DO UPDATE path would be denied.
   // Instead we insert and treat the unique-violation (23505) as success.
   const { error } = await supabase
-    .from('personal_vault')
+    .from("personal_vault")
     .insert({ user_id: user.id, photo_id: photoId });
 
   // 23505 = unique_violation: photo already saved to vault — that's fine
-  if (error && error.code !== '23505') {
-    return NextResponse.json({ error: 'Failed to save photo' }, { status: 500 });
+  if (error && error.code !== "23505") {
+    return NextResponse.json(
+      { error: "Failed to save photo" },
+      { status: 500 }
+    );
   }
 
   // The sync_vault_flag() DB trigger automatically sets
@@ -77,19 +82,24 @@ export async function DELETE(_req: Request, { params }: RouteParams) {
   const { id: photoId } = await params;
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { error } = await supabase
-    .from('personal_vault')
+    .from("personal_vault")
     .delete()
-    .eq('user_id', user.id)
-    .eq('photo_id', photoId);
+    .eq("user_id", user.id)
+    .eq("photo_id", photoId);
 
   if (error) {
-    return NextResponse.json({ error: 'Failed to unsave photo' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to unsave photo" },
+      { status: 500 }
+    );
   }
 
   // The sync_vault_flag() DB trigger automatically updates

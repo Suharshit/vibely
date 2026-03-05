@@ -9,16 +9,25 @@
 // ============================================================
 
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ScrollView, KeyboardAvoidingView, Platform,
-  Alert, ActivityIndicator,
-} from 'react-native';
-import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import { useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useEvents } from '@/hooks/useEvents';
-import type { AppStackParamList } from '@/navigation/types';
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import DateTimePicker, {
+  type DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useEvents } from "@/hooks/useEvents";
+import type { AppStackParamList } from "@/navigation/types";
 
 type Nav = NativeStackNavigationProp<AppStackParamList>;
 
@@ -26,9 +35,11 @@ export default function CreateEventScreen() {
   const navigation = useNavigation<Nav>();
   const { createEvent } = useEvents();
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [uploadPermission, setUploadPermission] = useState<'open' | 'restricted'>('open');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [uploadPermission, setUploadPermission] = useState<
+    "open" | "restricted"
+  >("open");
   const [isLoading, setIsLoading] = useState(false);
 
   // Date picker state
@@ -48,7 +59,7 @@ export default function CreateEventScreen() {
       newDate.setHours(eventDate.getHours(), eventDate.getMinutes());
       setEventDate(newDate);
       // On iOS, after picking date, show time picker
-      if (Platform.OS === 'ios') setShowTimePicker(true);
+      if (Platform.OS === "ios") setShowTimePicker(true);
     }
   };
 
@@ -58,18 +69,23 @@ export default function CreateEventScreen() {
   };
 
   const formatDate = (d: Date) =>
-    d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    d.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
 
   const formatTime = (d: Date) =>
-    d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 
   const handleCreate = async () => {
     if (title.trim().length < 2) {
-      Alert.alert('Event name required', 'Please enter at least 2 characters.');
+      Alert.alert("Event name required", "Please enter at least 2 characters.");
       return;
     }
     if (eventDate <= new Date()) {
-      Alert.alert('Invalid date', 'Event date must be in the future.');
+      Alert.alert("Invalid date", "Event date must be in the future.");
       return;
     }
 
@@ -83,20 +99,20 @@ export default function CreateEventScreen() {
     setIsLoading(false);
 
     if (!result.success) {
-      Alert.alert('Error', result.error ?? 'Failed to create event');
+      Alert.alert("Error", result.error ?? "Failed to create event");
       return;
     }
 
     // Navigate to the new event's detail screen
     if (result.event) {
-      navigation.replace('EventDetail', { eventId: result.event.id });
+      navigation.replace("EventDetail", { eventId: result.event.id });
     }
   };
 
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
         style={styles.container}
@@ -104,7 +120,10 @@ export default function CreateEventScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backBtn}
+          >
             <Text style={styles.backText}>← Back</Text>
           </TouchableOpacity>
           <Text style={styles.title}>New Event</Text>
@@ -147,23 +166,29 @@ export default function CreateEventScreen() {
                 style={[styles.input, styles.dateButton]}
                 onPress={() => setShowDatePicker(true)}
               >
-                <Text style={styles.dateButtonText}>{formatDate(eventDate)}</Text>
+                <Text style={styles.dateButtonText}>
+                  {formatDate(eventDate)}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.input, styles.timeButton]}
                 onPress={() => setShowTimePicker(true)}
               >
-                <Text style={styles.dateButtonText}>{formatTime(eventDate)}</Text>
+                <Text style={styles.dateButtonText}>
+                  {formatTime(eventDate)}
+                </Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.hint}>Photos expire 30 days after this date.</Text>
+            <Text style={styles.hint}>
+              Photos expire 30 days after this date.
+            </Text>
           </View>
 
           {showDatePicker && (
             <DateTimePicker
               value={eventDate}
               mode="date"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              display={Platform.OS === "ios" ? "spinner" : "default"}
               minimumDate={new Date()}
               onChange={onDateChange}
             />
@@ -173,7 +198,7 @@ export default function CreateEventScreen() {
             <DateTimePicker
               value={eventDate}
               mode="time"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              display={Platform.OS === "ios" ? "spinner" : "default"}
               onChange={onTimeChange}
             />
           )}
@@ -183,8 +208,11 @@ export default function CreateEventScreen() {
             <Text style={styles.label}>Who can upload photos?</Text>
             <View style={styles.permissionRow}>
               <TouchableOpacity
-                style={[styles.permissionOption, uploadPermission === 'open' && styles.permissionSelected]}
-                onPress={() => setUploadPermission('open')}
+                style={[
+                  styles.permissionOption,
+                  uploadPermission === "open" && styles.permissionSelected,
+                ]}
+                onPress={() => setUploadPermission("open")}
               >
                 <Text style={styles.permissionIcon}>🌐</Text>
                 <Text style={styles.permissionTitle}>Anyone with link</Text>
@@ -192,8 +220,12 @@ export default function CreateEventScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.permissionOption, uploadPermission === 'restricted' && styles.permissionSelected]}
-                onPress={() => setUploadPermission('restricted')}
+                style={[
+                  styles.permissionOption,
+                  uploadPermission === "restricted" &&
+                    styles.permissionSelected,
+                ]}
+                onPress={() => setUploadPermission("restricted")}
               >
                 <Text style={styles.permissionIcon}>🔒</Text>
                 <Text style={styles.permissionTitle}>Members only</Text>
@@ -222,57 +254,57 @@ export default function CreateEventScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: "#f9fafb" },
   content: { padding: 20, paddingBottom: 48 },
 
   header: { marginBottom: 24 },
   backBtn: { marginBottom: 12 },
-  backText: { fontSize: 14, color: '#7c3aed', fontWeight: '500' },
-  title: { fontSize: 24, fontWeight: '700', color: '#111827' },
+  backText: { fontSize: 14, color: "#7c3aed", fontWeight: "500" },
+  title: { fontSize: 24, fontWeight: "700", color: "#111827" },
 
   form: { gap: 20 },
   field: { gap: 6 },
-  label: { fontSize: 13, fontWeight: '600', color: '#374151' },
+  label: { fontSize: 13, fontWeight: "600", color: "#374151" },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: "#e5e7eb",
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 13,
     fontSize: 15,
-    color: '#111827',
+    color: "#111827",
   },
-  textArea: { minHeight: 80, textAlignVertical: 'top', paddingTop: 13 },
-  hint: { fontSize: 12, color: '#9ca3af' },
+  textArea: { minHeight: 80, textAlignVertical: "top", paddingTop: 13 },
+  hint: { fontSize: 12, color: "#9ca3af" },
 
-  dateRow: { flexDirection: 'row', gap: 10 },
+  dateRow: { flexDirection: "row", gap: 10 },
   dateButton: { flex: 3 },
   timeButton: { flex: 2 },
-  dateButtonText: { fontSize: 14, color: '#374151' },
+  dateButtonText: { fontSize: 14, color: "#374151" },
 
-  permissionRow: { flexDirection: 'row', gap: 10 },
+  permissionRow: { flexDirection: "row", gap: 10 },
   permissionOption: {
     flex: 1,
     padding: 14,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#e5e7eb',
-    backgroundColor: '#fff',
+    borderColor: "#e5e7eb",
+    backgroundColor: "#fff",
     gap: 4,
   },
-  permissionSelected: { borderColor: '#7c3aed', backgroundColor: '#faf5ff' },
+  permissionSelected: { borderColor: "#7c3aed", backgroundColor: "#faf5ff" },
   permissionIcon: { fontSize: 20 },
-  permissionTitle: { fontSize: 13, fontWeight: '600', color: '#111827' },
-  permissionSubtitle: { fontSize: 11, color: '#9ca3af' },
+  permissionTitle: { fontSize: 13, fontWeight: "600", color: "#111827" },
+  permissionSubtitle: { fontSize: 11, color: "#9ca3af" },
 
   submitBtn: {
-    backgroundColor: '#7c3aed',
+    backgroundColor: "#7c3aed",
     borderRadius: 14,
     paddingVertical: 16,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 8,
   },
   submitBtnDisabled: { opacity: 0.5 },
-  submitText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  submitText: { color: "#fff", fontSize: 16, fontWeight: "600" },
 });

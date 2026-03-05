@@ -15,20 +15,20 @@
 // The Zod schemas here are shared so both sides use identical rules.
 // ============================================================
 
-import { z } from 'zod';
+import { z } from "zod";
 
 // ── Create Event ─────────────────────────────────────────────
 
 export const createEventSchema = z.object({
   title: z
     .string()
-    .min(2, 'Title must be at least 2 characters')
-    .max(100, 'Title must be under 100 characters')
+    .min(2, "Title must be at least 2 characters")
+    .max(100, "Title must be under 100 characters")
     .trim(),
 
   description: z
     .string()
-    .max(500, 'Description must be under 500 characters')
+    .max(500, "Description must be under 500 characters")
     .trim()
     .optional()
     .nullable(),
@@ -36,20 +36,18 @@ export const createEventSchema = z.object({
   event_date: z
     .string()
     // ISO 8601 string from form inputs (datetime-local)
-    .datetime({ message: 'Invalid date format' })
+    .datetime({ message: "Invalid date format" })
     .refine(
       (val) => new Date(val) > new Date(),
-      'Event date must be in the future'
+      "Event date must be in the future"
     ),
 
   expires_at: z
     .string()
-    .datetime({ message: 'Invalid expiry date format' })
+    .datetime({ message: "Invalid expiry date format" })
     .optional(), // If omitted, API defaults to event_date + 30 days
 
-  upload_permission: z
-    .enum(['open', 'restricted'])
-    .default('open'),
+  upload_permission: z.enum(["open", "restricted"]).default("open"),
 });
 
 export type CreateEventInput = z.infer<typeof createEventSchema>;
@@ -61,8 +59,8 @@ export const updateEventSchema = z.object({
   description: z.string().max(500).trim().optional().nullable(),
   event_date: z.string().datetime().optional(),
   expires_at: z.string().datetime().optional(),
-  upload_permission: z.enum(['open', 'restricted']).optional(),
-  status: z.enum(['active', 'expired', 'archived']).optional(),
+  upload_permission: z.enum(["open", "restricted"]).optional(),
+  status: z.enum(["active", "expired", "archived"]).optional(),
 });
 
 export type UpdateEventInput = z.infer<typeof updateEventSchema>;
@@ -71,10 +69,7 @@ export type UpdateEventInput = z.infer<typeof updateEventSchema>;
 
 export const joinEventSchema = z.object({
   // Token from the invite URL — validated against DB
-  invite_token: z
-    .string()
-    .length(12, 'Invalid invite token')
-    .trim(),
+  invite_token: z.string().length(12, "Invalid invite token").trim(),
 });
 
 export type JoinEventInput = z.infer<typeof joinEventSchema>;

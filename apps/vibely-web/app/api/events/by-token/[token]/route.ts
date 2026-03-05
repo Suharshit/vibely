@@ -11,8 +11,8 @@
 // We limit returned fields to only what the preview page needs.
 // ============================================================
 
-import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/server';
+import { NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/server";
 
 type RouteParams = { params: Promise<{ token: string }> };
 
@@ -20,14 +20,15 @@ export async function GET(_req: Request, { params }: RouteParams) {
   const { token } = await params;
 
   if (!token || token.length !== 12) {
-    return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid token" }, { status: 400 });
   }
 
   const supabase = createAdminClient();
 
   const { data: event, error } = await supabase
-    .from('events')
-    .select(`
+    .from("events")
+    .select(
+      `
       id,
       title,
       description,
@@ -42,23 +43,27 @@ export async function GET(_req: Request, { params }: RouteParams) {
         name,
         avatar_url
       )
-    `)
-    .eq('invite_token', token)
+    `
+    )
+    .eq("invite_token", token)
     .single();
 
   if (error || !event) {
-    return NextResponse.json({ error: 'Invalid invite link' }, { status: 404 });
+    return NextResponse.json({ error: "Invalid invite link" }, { status: 404 });
   }
 
-  if (event.status !== 'active') {
-    return NextResponse.json({ error: 'This event has ended' }, { status: 410 });
+  if (event.status !== "active") {
+    return NextResponse.json(
+      { error: "This event has ended" },
+      { status: 410 }
+    );
   }
 
   // Get member count for social proof on the invite page
   const { count: memberCount } = await supabase
-    .from('event_members')
-    .select('id', { count: 'exact', head: true })
-    .eq('event_id', event.id);
+    .from("event_members")
+    .select("id", { count: "exact", head: true })
+    .eq("event_id", event.id);
 
   return NextResponse.json({
     event: { ...event, member_count: memberCount ?? 0 },

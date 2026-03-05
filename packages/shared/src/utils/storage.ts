@@ -18,9 +18,9 @@
 // collide because each upload gets its own photoId subfolder.
 // ============================================================
 
-import { customAlphabet } from 'nanoid';
+import { customAlphabet } from "nanoid";
 
-const idAlphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+const idAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
 export const generatePhotoId = customAlphabet(idAlphabet, 21); // same entropy as UUID
 
 // ── Storage key helpers ───────────────────────────────────────
@@ -42,14 +42,14 @@ export function buildStorageKey(
  * strip special characters. Keeps the extension.
  */
 export function sanitizeFilename(filename: string): string {
-  const ext = filename.split('.').pop()?.toLowerCase() ?? 'jpg';
+  const ext = filename.split(".").pop()?.toLowerCase() ?? "jpg";
   const base = filename
-    .replace(/\.[^/.]+$/, '')          // strip extension
+    .replace(/\.[^/.]+$/, "") // strip extension
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')       // non-alphanumeric → hyphen
-    .replace(/^-+|-+$/g, '')           // strip leading/trailing hyphens
-    .slice(0, 50);                     // max 50 chars for the base
-  return `${base || 'photo'}.${ext}`;
+    .replace(/[^a-z0-9]+/g, "-") // non-alphanumeric → hyphen
+    .replace(/^-+|-+$/g, "") // strip leading/trailing hyphens
+    .slice(0, 50); // max 50 chars for the base
+  return `${base || "photo"}.${ext}`;
 }
 
 /**
@@ -57,7 +57,7 @@ export function sanitizeFilename(filename: string): string {
  * "events/abc123/xyz789/photo.jpg" → "abc123"
  */
 export function eventIdFromStorageKey(storageKey: string): string {
-  return storageKey.split('/')[1] ?? '';
+  return storageKey.split("/")[1] ?? "";
 }
 
 // ── ImageKit URL builders ─────────────────────────────────────
@@ -77,9 +77,10 @@ export function eventIdFromStorageKey(storageKey: string): string {
 // ImageKit transformation format: ?tr=<transforms>
 // or inline: /tr:<transforms>/ before the filename in the path
 
-const IMAGEKIT_ENDPOINT = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT
-  ?? process.env.EXPO_PUBLIC_IMAGEKIT_URL_ENDPOINT
-  ?? '';
+const IMAGEKIT_ENDPOINT =
+  process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT ??
+  process.env.EXPO_PUBLIC_IMAGEKIT_URL_ENDPOINT ??
+  "";
 
 /**
  * Build an ImageKit delivery URL with optional transformations.
@@ -102,7 +103,7 @@ export function imagekitUrl(storageKey: string, transforms?: string): string {
     // Fallback during local dev before ImageKit is configured
     return storageKey;
   }
-  const base = `${IMAGEKIT_ENDPOINT.replace(/\/$/, '')}/${storageKey}`;
+  const base = `${IMAGEKIT_ENDPOINT.replace(/\/$/, "")}/${storageKey}`;
   if (!transforms) return base;
   return `${base}?tr=${transforms}`;
 }
@@ -113,28 +114,28 @@ export function imagekitUrl(storageKey: string, transforms?: string): string {
 
 /** 400×400 thumbnail for gallery grids */
 export function thumbnailUrl(storageKey: string): string {
-  return imagekitUrl(storageKey, 'w-400,h-400,c-at_max,q-75,f-webp');
+  return imagekitUrl(storageKey, "w-400,h-400,c-at_max,q-75,f-webp");
 }
 
 /** 1200px wide preview for lightbox / full screen */
 export function previewUrl(storageKey: string): string {
-  return imagekitUrl(storageKey, 'w-1200,q-85,f-webp');
+  return imagekitUrl(storageKey, "w-1200,q-85,f-webp");
 }
 
 /** Original quality, just compression */
 export function fullUrl(storageKey: string): string {
-  return imagekitUrl(storageKey, 'q-90,f-webp');
+  return imagekitUrl(storageKey, "q-90,f-webp");
 }
 
 // ── Validation helpers ────────────────────────────────────────
 
 export const ALLOWED_MIME_TYPES = [
-  'image/jpeg',
-  'image/jpg',
-  'image/png',
-  'image/webp',
-  'image/heic',
-  'image/heif',
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif",
 ] as const;
 
 export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
@@ -143,7 +144,11 @@ export function validateImageFile(file: { type: string; size: number }): {
   valid: boolean;
   error?: string;
 } {
-  if (!ALLOWED_MIME_TYPES.includes(file.type as typeof ALLOWED_MIME_TYPES[number])) {
+  if (
+    !ALLOWED_MIME_TYPES.includes(
+      file.type as (typeof ALLOWED_MIME_TYPES)[number]
+    )
+  ) {
     return {
       valid: false,
       error: `File type "${file.type}" is not supported. Use JPEG, PNG, WebP, or HEIC.`,
