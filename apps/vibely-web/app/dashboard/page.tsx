@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 // ============================================================
 // apps/web/app/dashboard/page.tsx
@@ -14,18 +14,18 @@
 // loading flicker. We keep it simple here for the MVP.
 // ============================================================
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useEvents } from '@/hooks/useEvents';
-import { EventCard } from '@/components/events/EventCard';
-import { isEventExpired } from '@shared/utils/invite';
+import { useState } from "react";
+import Link from "next/link";
+import { useEvents } from "@/hooks/useEvents";
+import { EventCard } from "@/components/events/EventCard";
+import { isEventExpired } from "@shared/utils/invite";
 
 export default function DashboardPage() {
   const { events, isLoading, error, deleteEvent } = useEvents();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
-    const event = events.find(e => e.id === id);
+    const event = events.find((e) => e.id === id);
     if (!event) return;
 
     // Simple browser confirm — Phase 14 (polish) will replace with a modal
@@ -40,8 +40,12 @@ export default function DashboardPage() {
   };
 
   // Split events into upcoming (active) and past (expired/archived)
-  const upcoming = events.filter(e => !isEventExpired(e.expires_at) && e.status === 'active');
-  const past = events.filter(e => isEventExpired(e.expires_at) || e.status !== 'active');
+  const upcoming = events.filter(
+    (e) => !isEventExpired(e.expires_at) && e.status === "active"
+  );
+  const past = events.filter(
+    (e) => isEventExpired(e.expires_at) || e.status !== "active"
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -50,10 +54,16 @@ export default function DashboardPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <h1 className="text-lg font-bold text-gray-900">Vibely</h1>
           <nav className="flex items-center gap-4">
-            <Link href="/vault" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+            <Link
+              href="/vault"
+              className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+            >
               Vault
             </Link>
-            <Link href="/profile" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+            <Link
+              href="/profile"
+              className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+            >
               Profile
             </Link>
           </nav>
@@ -66,7 +76,9 @@ export default function DashboardPage() {
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Your Events</h2>
             <p className="mt-1 text-sm text-gray-500">
-              {events.length === 0 ? 'No events yet' : `${events.length} event${events.length !== 1 ? 's' : ''}`}
+              {events.length === 0
+                ? "No events yet"
+                : `${events.length} event${events.length !== 1 ? "s" : ""}`}
             </p>
           </div>
 
@@ -74,8 +86,18 @@ export default function DashboardPage() {
             href="/events/create"
             className="flex items-center gap-2 bg-violet-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-violet-700 transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             Create event
           </Link>
@@ -91,8 +113,11 @@ export default function DashboardPage() {
         {/* Loading skeleton */}
         {isLoading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse"
+              >
                 <div className="h-32 bg-gray-100" />
                 <div className="p-4 space-y-3">
                   <div className="h-4 bg-gray-100 rounded w-3/4" />
@@ -107,9 +132,12 @@ export default function DashboardPage() {
         {!isLoading && events.length === 0 && (
           <div className="text-center py-20">
             <div className="text-5xl mb-4">📷</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No events yet</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              No events yet
+            </h3>
             <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
-              Create your first event and start collecting photos from everyone there.
+              Create your first event and start collecting photos from everyone
+              there.
             </p>
             <Link
               href="/events/create"
@@ -127,10 +155,14 @@ export default function DashboardPage() {
               Upcoming
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {upcoming.map(event => (
+              {upcoming.map((event) => (
                 <div
                   key={event.id}
-                  className={deletingId === event.id ? 'opacity-50 pointer-events-none' : ''}
+                  className={
+                    deletingId === event.id
+                      ? "opacity-50 pointer-events-none"
+                      : ""
+                  }
                 >
                   <EventCard event={event} onDelete={handleDelete} />
                 </div>
@@ -146,8 +178,12 @@ export default function DashboardPage() {
               Past events
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {past.map(event => (
-                <EventCard key={event.id} event={event} onDelete={handleDelete} />
+              {past.map((event) => (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  onDelete={handleDelete}
+                />
               ))}
             </div>
           </section>

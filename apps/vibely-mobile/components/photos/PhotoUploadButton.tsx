@@ -21,12 +21,16 @@
 // ============================================================
 
 import {
-  TouchableOpacity, View, Text, StyleSheet,
-  Alert, ActivityIndicator,
-} from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import * as ImageManipulator from 'expo-image-manipulator';
-import { useState } from 'react';
+  TouchableOpacity,
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
+import { useState } from "react";
 
 interface PhotoUploadButtonProps {
   eventId: string;
@@ -63,11 +67,11 @@ export function PhotoUploadButton({
 
     // Step 1: Check/request permissions
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
+    if (status !== "granted") {
       Alert.alert(
-        'Permission required',
-        'Please allow photo access in Settings to upload photos.',
-        [{ text: 'OK' }]
+        "Permission required",
+        "Please allow photo access in Settings to upload photos.",
+        [{ text: "OK" }]
       );
       return;
     }
@@ -82,8 +86,8 @@ export function PhotoUploadButton({
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsMultipleSelection: true,
-        selectionLimit: 10,          // max 10 photos at once
-        quality: 1,                  // full quality — we compress ourselves
+        selectionLimit: 10, // max 10 photos at once
+        quality: 1, // full quality — we compress ourselves
         exif: false,
       });
 
@@ -102,28 +106,29 @@ export function PhotoUploadButton({
         );
 
         // Build a clean filename
-        const originalName = asset.fileName ?? asset.uri.split('/').pop() ?? 'photo';
-        const baseName = originalName.replace(/\.[^/.]+$/, '');
+        const originalName =
+          asset.fileName ?? asset.uri.split("/").pop() ?? "photo";
+        const baseName = originalName.replace(/\.[^/.]+$/, "");
         const filename = `${baseName}.jpg`;
 
         // Get file info for size (manipulateAsync doesn't return size directly)
         const fileInfo = await fetch(manipulated.uri)
-          .then(r => r.blob())
-          .then(b => ({ size: b.size }))
+          .then((r) => r.blob())
+          .then((b) => ({ size: b.size }))
           .catch(() => ({ size: asset.fileSize ?? 0 }));
 
         // Step 4: Kick off the upload
         await onUpload(
           manipulated.uri,
           filename,
-          'image/jpeg',
+          "image/jpeg",
           fileInfo.size,
           guestToken
         );
       }
     } catch (err) {
-      Alert.alert('Error', 'Failed to process image. Please try again.');
-      console.error('[PhotoUploadButton]', err);
+      Alert.alert("Error", "Failed to process image. Please try again.");
+      console.error("[PhotoUploadButton]", err);
     } finally {
       setIsPicking(false);
     }
@@ -161,7 +166,7 @@ export function PhotoUploadIcon({
   const handlePress = async () => {
     if (disabled || isPicking) return;
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') return;
+    if (status !== "granted") return;
 
     setIsPicking(true);
     try {
@@ -179,11 +184,21 @@ export function PhotoUploadIcon({
         const manipulated = await ImageManipulator.manipulateAsync(
           asset.uri,
           COMPRESS_OPTIONS,
-          { compress: COMPRESS_QUALITY, format: ImageManipulator.SaveFormat.JPEG }
+          {
+            compress: COMPRESS_QUALITY,
+            format: ImageManipulator.SaveFormat.JPEG,
+          }
         );
-        const filename = (asset.fileName ?? 'photo').replace(/\.[^/.]+$/, '') + '.jpg';
-        const blob = await fetch(manipulated.uri).then(r => r.blob());
-        await onUpload(manipulated.uri, filename, 'image/jpeg', blob.size, guestToken);
+        const filename =
+          (asset.fileName ?? "photo").replace(/\.[^/.]+$/, "") + ".jpg";
+        const blob = await fetch(manipulated.uri).then((r) => r.blob());
+        await onUpload(
+          manipulated.uri,
+          filename,
+          "image/jpeg",
+          blob.size,
+          guestToken
+        );
       }
     } finally {
       setIsPicking(false);
@@ -196,34 +211,35 @@ export function PhotoUploadIcon({
       disabled={disabled || isPicking}
       style={styles.iconButton}
     >
-      {isPicking
-        ? <ActivityIndicator size="small" color="#7c3aed" />
-        : <Text style={styles.iconButtonText}>＋</Text>
-      }
+      {isPicking ? (
+        <ActivityIndicator size="small" color="#7c3aed" />
+      ) : (
+        <Text style={styles.iconButtonText}>＋</Text>
+      )}
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#7c3aed',
+    backgroundColor: "#7c3aed",
     borderRadius: 14,
     paddingVertical: 14,
     paddingHorizontal: 24,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonDisabled: { opacity: 0.5 },
-  inner: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  inner: { flexDirection: "row", alignItems: "center", gap: 8 },
   icon: { fontSize: 18 },
-  label: { fontSize: 15, fontWeight: '600', color: '#fff' },
+  label: { fontSize: 15, fontWeight: "600", color: "#fff" },
 
   iconButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#7c3aed',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#7c3aed",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  iconButtonText: { fontSize: 22, color: '#fff', lineHeight: 24 },
+  iconButtonText: { fontSize: 22, color: "#fff", lineHeight: 24 },
 });

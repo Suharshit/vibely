@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 // ============================================================
 // apps/web/components/events/CreateEventForm.tsx
@@ -14,14 +14,14 @@
 // sending to the API.
 // ============================================================
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useEvents } from '@/hooks/useEvents';
-import { defaultExpiresAt } from '@shared/utils/invite';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEvents } from "@/hooks/useEvents";
+import { defaultExpiresAt } from "@shared/utils/invite";
 
 // Format a Date to the value format expected by datetime-local
 function toDatetimeLocal(date: Date): string {
-  const pad = (n: number) => String(n).padStart(2, '0');
+  const pad = (n: number) => String(n).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
@@ -37,30 +37,32 @@ export function CreateEventForm() {
   const router = useRouter();
   const { createEvent } = useEvents();
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [eventDate, setEventDate] = useState(defaultEventDate);
-  const [uploadPermission, setUploadPermission] = useState<'open' | 'restricted'>('open');
+  const [uploadPermission, setUploadPermission] = useState<
+    "open" | "restricted"
+  >("open");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
+  const [submitError, setSubmitError] = useState("");
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
     if (title.trim().length < 2) {
-      newErrors.title = 'Title must be at least 2 characters.';
+      newErrors.title = "Title must be at least 2 characters.";
     }
     if (title.trim().length > 100) {
-      newErrors.title = 'Title must be under 100 characters.';
+      newErrors.title = "Title must be under 100 characters.";
     }
     if (description.length > 500) {
-      newErrors.description = 'Description must be under 500 characters.';
+      newErrors.description = "Description must be under 500 characters.";
     }
     if (!eventDate) {
-      newErrors.event_date = 'Please pick an event date.';
+      newErrors.event_date = "Please pick an event date.";
     } else if (new Date(eventDate) <= new Date()) {
-      newErrors.event_date = 'Event date must be in the future.';
+      newErrors.event_date = "Event date must be in the future.";
     }
 
     setErrors(newErrors);
@@ -69,7 +71,7 @@ export function CreateEventForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitError('');
+    setSubmitError("");
 
     if (!validate()) return;
 
@@ -89,7 +91,7 @@ export function CreateEventForm() {
     setIsSubmitting(false);
 
     if (!result.success) {
-      setSubmitError(result.error ?? 'Something went wrong. Please try again.');
+      setSubmitError(result.error ?? "Something went wrong. Please try again.");
       return;
     }
 
@@ -107,60 +109,86 @@ export function CreateEventForm() {
 
       {/* Title */}
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1.5">
+        <label
+          htmlFor="title"
+          className="block text-sm font-medium text-gray-700 mb-1.5"
+        >
           Event name <span className="text-red-500">*</span>
         </label>
         <input
           id="title"
           type="text"
           value={title}
-          onChange={e => setTitle(e.target.value)}
+          onChange={(e) => setTitle(e.target.value)}
           placeholder="e.g. Sarah's Wedding, Friday Game Night"
           maxLength={100}
           className={`w-full px-4 py-3 rounded-xl border text-sm transition-all focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 ${
-            errors.title ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-white'
+            errors.title
+              ? "border-red-300 bg-red-50"
+              : "border-gray-200 bg-white"
           }`}
         />
-        {errors.title && <p className="mt-1.5 text-xs text-red-600">{errors.title}</p>}
-        <p className="mt-1 text-xs text-gray-400 text-right">{title.length}/100</p>
+        {errors.title && (
+          <p className="mt-1.5 text-xs text-red-600">{errors.title}</p>
+        )}
+        <p className="mt-1 text-xs text-gray-400 text-right">
+          {title.length}/100
+        </p>
       </div>
 
       {/* Description */}
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1.5">
-          Description <span className="text-gray-400 font-normal">(optional)</span>
+        <label
+          htmlFor="description"
+          className="block text-sm font-medium text-gray-700 mb-1.5"
+        >
+          Description{" "}
+          <span className="text-gray-400 font-normal">(optional)</span>
         </label>
         <textarea
           id="description"
           value={description}
-          onChange={e => setDescription(e.target.value)}
+          onChange={(e) => setDescription(e.target.value)}
           placeholder="Tell guests what to expect…"
           rows={3}
           maxLength={500}
           className={`w-full px-4 py-3 rounded-xl border text-sm transition-all focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 resize-none ${
-            errors.description ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-white'
+            errors.description
+              ? "border-red-300 bg-red-50"
+              : "border-gray-200 bg-white"
           }`}
         />
-        {errors.description && <p className="mt-1.5 text-xs text-red-600">{errors.description}</p>}
-        <p className="mt-1 text-xs text-gray-400 text-right">{description.length}/500</p>
+        {errors.description && (
+          <p className="mt-1.5 text-xs text-red-600">{errors.description}</p>
+        )}
+        <p className="mt-1 text-xs text-gray-400 text-right">
+          {description.length}/500
+        </p>
       </div>
 
       {/* Event Date */}
       <div>
-        <label htmlFor="event_date" className="block text-sm font-medium text-gray-700 mb-1.5">
+        <label
+          htmlFor="event_date"
+          className="block text-sm font-medium text-gray-700 mb-1.5"
+        >
           Date & time <span className="text-red-500">*</span>
         </label>
         <input
           id="event_date"
           type="datetime-local"
           value={eventDate}
-          onChange={e => setEventDate(e.target.value)}
+          onChange={(e) => setEventDate(e.target.value)}
           min={toDatetimeLocal(new Date())}
           className={`w-full px-4 py-3 rounded-xl border text-sm transition-all focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 ${
-            errors.event_date ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-white'
+            errors.event_date
+              ? "border-red-300 bg-red-50"
+              : "border-gray-200 bg-white"
           }`}
         />
-        {errors.event_date && <p className="mt-1.5 text-xs text-red-600">{errors.event_date}</p>}
+        {errors.event_date && (
+          <p className="mt-1.5 text-xs text-red-600">{errors.event_date}</p>
+        )}
         <p className="mt-1.5 text-xs text-gray-400">
           Photos will auto-expire 30 days after this date.
         </p>
@@ -175,43 +203,51 @@ export function CreateEventForm() {
           {/* Open */}
           <label
             className={`flex flex-col gap-1 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-              uploadPermission === 'open'
-                ? 'border-violet-500 bg-violet-50'
-                : 'border-gray-100 bg-white hover:border-gray-200'
+              uploadPermission === "open"
+                ? "border-violet-500 bg-violet-50"
+                : "border-gray-100 bg-white hover:border-gray-200"
             }`}
           >
             <input
               type="radio"
               name="upload_permission"
               value="open"
-              checked={uploadPermission === 'open'}
-              onChange={() => setUploadPermission('open')}
+              checked={uploadPermission === "open"}
+              onChange={() => setUploadPermission("open")}
               className="sr-only"
             />
             <span className="text-xl">🌐</span>
-            <span className="font-medium text-sm text-gray-900">Anyone with link</span>
-            <span className="text-xs text-gray-500">Guests can upload without an account</span>
+            <span className="font-medium text-sm text-gray-900">
+              Anyone with link
+            </span>
+            <span className="text-xs text-gray-500">
+              Guests can upload without an account
+            </span>
           </label>
 
           {/* Restricted */}
           <label
             className={`flex flex-col gap-1 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-              uploadPermission === 'restricted'
-                ? 'border-violet-500 bg-violet-50'
-                : 'border-gray-100 bg-white hover:border-gray-200'
+              uploadPermission === "restricted"
+                ? "border-violet-500 bg-violet-50"
+                : "border-gray-100 bg-white hover:border-gray-200"
             }`}
           >
             <input
               type="radio"
               name="upload_permission"
               value="restricted"
-              checked={uploadPermission === 'restricted'}
-              onChange={() => setUploadPermission('restricted')}
+              checked={uploadPermission === "restricted"}
+              onChange={() => setUploadPermission("restricted")}
               className="sr-only"
             />
             <span className="text-xl">🔒</span>
-            <span className="font-medium text-sm text-gray-900">Members only</span>
-            <span className="text-xs text-gray-500">Only registered members can upload</span>
+            <span className="font-medium text-sm text-gray-900">
+              Members only
+            </span>
+            <span className="text-xs text-gray-500">
+              Only registered members can upload
+            </span>
           </label>
         </div>
       </div>
@@ -230,7 +266,7 @@ export function CreateEventForm() {
           disabled={isSubmitting}
           className="flex-1 py-3 px-4 rounded-xl bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? 'Creating…' : 'Create event'}
+          {isSubmitting ? "Creating…" : "Create event"}
         </button>
       </div>
     </form>

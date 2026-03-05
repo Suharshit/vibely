@@ -30,10 +30,10 @@
 // abandoned ones (e.g. user closed tab mid-upload) in the cron job.
 // ============================================================
 
-import { NextResponse } from 'next/server';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
-import { uploadInitSchema } from '@shared/validation/photo.schemas';
-import { buildStorageKey, sanitizeFilename } from '@shared/utils/storage';
+import { NextResponse } from "next/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { uploadInitSchema } from "@shared/validation/photo.schemas";
+import { buildStorageKey, sanitizeFilename } from "@shared/utils/storage";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -44,18 +44,22 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   const parsed = uploadInitSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
+      {
+        error: "Validation failed",
+        details: parsed.error.flatten().fieldErrors,
+      },
       { status: 422 }
     );
   }
 
-  const { event_id, filename, content_type, file_size, guest_token } = parsed.data;
+  const { event_id, filename, content_type, file_size, guest_token } =
+    parsed.data;
 
   // ── Step 2: Resolve the uploader identity ───────────────────
   // Either an authenticated user OR a guest with a valid session token.
@@ -65,50 +69,53 @@ export async function POST(request: Request) {
   if (guest_token) {
     // Guest upload path: validate the session token
     const { data: guestSession } = await adminSupabase
-      .from('guest_sessions')
-      .select('id, event_id')
-      .eq('session_token', guest_token)
-      .eq('event_id', event_id)  // token must match this event
+      .from("guest_sessions")
+      .select("id, event_id")
+      .eq("session_token", guest_token)
+      .eq("event_id", event_id) // token must match this event
       .single();
 
     if (!guestSession) {
       return NextResponse.json(
-        { error: 'Invalid or expired guest session' },
+        { error: "Invalid or expired guest session" },
         { status: 401 }
       );
     }
     uploadedByGuest = guestSession.id;
   } else {
     // Authenticated user path
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     uploadedByUser = user.id;
   }
 
   // ── Step 3: Verify upload permission for this event ─────────
   const { data: event } = await adminSupabase
-    .from('events')
-    .select('id, status, upload_permission')
-    .eq('id', event_id)
+    .from("events")
+    .select("id, status, upload_permission")
+    .eq("id", event_id)
     .single();
 
   if (!event) {
-    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+    return NextResponse.json({ error: "Event not found" }, { status: 404 });
   }
-  if (event.status !== 'active') {
+  if (event.status !== "active") {
     return NextResponse.json(
-      { error: 'This event has ended. Uploads are no longer accepted.' },
+      { error: "This event has ended. Uploads are no longer accepted." },
       { status: 410 }
     );
   }
 
   // If upload_permission is 'restricted', only registered members can upload.
   // Guests are blocked.
-  if (event.upload_permission === 'restricted' && !uploadedByUser) {
+  if (event.upload_permission === "restricted" && !uploadedByUser) {
     return NextResponse.json(
-      { error: 'This event requires an account to upload photos.' },
+      { error: "This event requires an account to upload photos." },
       { status: 403 }
     );
   }
@@ -116,15 +123,15 @@ export async function POST(request: Request) {
   // If authenticated user, verify they're actually a member of this event
   if (uploadedByUser) {
     const { data: membership } = await supabase
-      .from('event_members')
-      .select('id')
-      .eq('event_id', event_id)
-      .eq('user_id', uploadedByUser)
+      .from("event_members")
+      .select("id")
+      .eq("event_id", event_id)
+      .eq("user_id", uploadedByUser)
       .single();
 
     if (!membership) {
       return NextResponse.json(
-        { error: 'You must join this event before uploading photos.' },
+        { error: "You must join this event before uploading photos." },
         { status: 403 }
       );
     }
@@ -140,15 +147,14 @@ export async function POST(request: Request) {
   // The signed URL allows a PUT request directly from the browser
   // to Supabase Storage without exposing credentials.
   // TTL: 60 seconds — enough for the client to start uploading.
-  const { data: signedData, error: signedError } = await adminSupabase
-    .storage
-    .from('event-photos')
+  const { data: signedData, error: signedError } = await adminSupabase.storage
+    .from("event-photos")
     .createSignedUploadUrl(storageKey);
 
   if (signedError || !signedData) {
-    console.error('[POST /api/photos/upload] Signed URL error:', signedError);
+    console.error("[POST /api/photos/upload] Signed URL error:", signedError);
     return NextResponse.json(
-      { error: 'Failed to generate upload URL. Please try again.' },
+      { error: "Failed to generate upload URL. Please try again." },
       { status: 500 }
     );
   }
@@ -156,31 +162,35 @@ export async function POST(request: Request) {
   // ── Step 6: Save photo metadata row with status='uploading' ──
   // We use the thumbnail_key as the same path — ImageKit will serve
   // a transformed version from the same storage_key.
-  const { error: insertError } = await adminSupabase
-    .from('photos')
-    .insert({
-      id: photoId,
-      event_id,
-      uploaded_by_user: uploadedByUser,
-      uploaded_by_guest: uploadedByGuest,
-      storage_key: storageKey,
-      thumbnail_key: storageKey,  // ImageKit transforms handle sizing
-      original_filename: sanitizeFilename(filename),
-      file_size,
-      status: 'uploading',        // flipped to 'active' after upload completes
-      is_saved_to_vault: false,
-    });
+  const { error: insertError } = await adminSupabase.from("photos").insert({
+    id: photoId,
+    event_id,
+    uploaded_by_user: uploadedByUser,
+    uploaded_by_guest: uploadedByGuest,
+    storage_key: storageKey,
+    thumbnail_key: storageKey, // ImageKit transforms handle sizing
+    original_filename: sanitizeFilename(filename),
+    file_size,
+    status: "uploading", // flipped to 'active' after upload completes
+    is_saved_to_vault: false,
+  });
 
   if (insertError) {
-    console.error('[POST /api/photos/upload] Insert error:', insertError);
-    return NextResponse.json({ error: 'Failed to create photo record' }, { status: 500 });
+    console.error("[POST /api/photos/upload] Insert error:", insertError);
+    return NextResponse.json(
+      { error: "Failed to create photo record" },
+      { status: 500 }
+    );
   }
 
   // Return the signed URL and photo ID to the client
-  return NextResponse.json({
-    photo_id: photoId,
-    storage_key: storageKey,
-    upload_url: signedData.signedUrl,
-    token: signedData.token,
-  }, { status: 201 });
+  return NextResponse.json(
+    {
+      photo_id: photoId,
+      storage_key: storageKey,
+      upload_url: signedData.signedUrl,
+      token: signedData.token,
+    },
+    { status: 201 }
+  );
 }
