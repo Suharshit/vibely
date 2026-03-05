@@ -7,4 +7,4 @@ export * from "./auth";
 export * from "./user";
 export * from "./event.schemas";
 export * from "./guest";
-export * from "./photo";
+export * from "./photo.schemas";
