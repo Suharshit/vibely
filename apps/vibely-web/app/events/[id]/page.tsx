@@ -46,7 +46,7 @@ export default function EventDetailPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Cover image banner */}
-      <div className="h-48 sm:h-64 bg-gradient-to-br from-violet-200 via-purple-100 to-pink-100 relative">
+      <div className="h-48 sm:h-64 bg-linear-to-br from-violet-200 via-purple-100 to-pink-100 relative">
         {event.cover_image_url && (
           <img src={event.cover_image_url} alt={event.title} className="w-full h-full object-cover" />
         )}
