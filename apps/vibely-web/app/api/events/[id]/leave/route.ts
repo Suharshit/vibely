@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
  * Leave an event
  */
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -21,7 +21,7 @@ export async function DELETE(
       { message: `Leave event ${id} endpoint - Not implemented yet` },
       { status: 501 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -17,7 +17,7 @@ import { NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { thumbnailUrl, previewUrl } from "@shared/utils/storage";
 
-export async function GET(request: Request) {
+export async function GET() {
   const supabase = await createClient();
   const adminSupabase = createAdminClient();
 
@@ -71,6 +71,32 @@ export async function GET(request: Request) {
   // may not work perfectly on joined tables in all Supabase versions)
   const validEntries = (vaultEntries ?? []).filter((e) => e.photo !== null);
 
+  // Build signed URLs as a fallback for environments where ImageKit cannot
+  // fetch directly from a private bucket.
+  const signedByPath = new Map<string, string>();
+  const storageKeys = validEntries
+    .map((entry) => (entry.photo as { storage_key?: string } | null)?.storage_key)
+    .filter((key): key is string => !!key);
+
+  if (storageKeys.length > 0) {
+    const { data: signedData, error: signedError } =
+      await adminSupabase.storage
+        .from("event-photos")
+        .createSignedUrls(storageKeys, 60 * 60);
+
+    if (signedError) {
+      console.error("[GET /api/vault] signed URL error", signedError);
+    } else {
+      for (const item of signedData ?? []) {
+        if (!item.path || !item.signedUrl) continue;
+        const normalized = item.signedUrl.startsWith("http")
+          ? item.signedUrl
+          : `${process.env.NEXT_PUBLIC_SUPABASE_URL}${item.signedUrl}`;
+        signedByPath.set(item.path, normalized);
+      }
+    }
+  }
+
   // Augment with ImageKit URLs
   const augmented = validEntries.map((entry) => {
     const photo = entry.photo as any;
@@ -81,6 +107,7 @@ export async function GET(request: Request) {
         ...photo,
         thumbnail_url: thumbnailUrl(photo.storage_key),
         preview_url: previewUrl(photo.storage_key),
+        fallback_url: signedByPath.get(photo.storage_key) ?? null,
       },
     };
   });

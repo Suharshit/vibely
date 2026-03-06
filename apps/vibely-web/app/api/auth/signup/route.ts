@@ -6,8 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { email, password, name } = body;
+    await request.json();
 
     // TODO: Implement signup logic with Supabase
     // 1. Validate input with Zod
@@ -19,7 +18,7 @@ export async function POST(request: NextRequest) {
       { message: "Signup endpoint - Not implemented yet" },
       { status: 501 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -5,17 +5,15 @@
 // ============================================================
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useVault } from "@/hooks/useVault";
 import Image from "next/image";
 
 export default function VaultPage() {
+  const router = useRouter();
   const { groups, total, isLoading, error, unsave } = useVault();
   const [view, setView] = useState<"grouped" | "grid">("grouped");
-  const [lightbox, setLightbox] = useState<{
-    url: string;
-    name: string;
-  } | null>(null);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -119,12 +117,7 @@ export default function VaultPage() {
                       key={entry.vault_entry_id}
                       entry={entry}
                       onUnsave={() => unsave(entry.photo.id)}
-                      onOpen={() =>
-                        setLightbox({
-                          url: entry.photo.preview_url,
-                          name: entry.photo.original_filename,
-                        })
-                      }
+                      onOpen={() => router.push(`/photos/${entry.photo.id}`)}
                     />
                   ))}
                 </div>
@@ -143,51 +136,12 @@ export default function VaultPage() {
                   key={entry.vault_entry_id}
                   entry={entry}
                   onUnsave={() => unsave(entry.photo.id)}
-                  onOpen={() =>
-                    setLightbox({
-                      url: entry.photo.preview_url,
-                      name: entry.photo.original_filename,
-                    })
-                  }
+                  onOpen={() => router.push(`/photos/${entry.photo.id}`)}
                 />
               ))}
           </div>
         )}
       </div>
-
-      {/* Lightbox */}
-      {lightbox && (
-        <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
-          onClick={() => setLightbox(null)}
-        >
-          <Image
-            src={lightbox.url}
-            alt={lightbox.name}
-            className="max-w-full max-h-[90vh] object-contain rounded-xl"
-            onClick={(e) => e.stopPropagation()}
-            fill
-          />
-          <button
-            onClick={() => setLightbox(null)}
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/20 text-white hover:bg-white/30"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-      )}
     </div>
   );
 }
@@ -206,21 +160,57 @@ function VaultCard({
       thumbnail_url: string;
       original_filename: string;
       preview_url: string;
+      fallback_url: string | null;
     };
   };
   onUnsave: () => void;
   onOpen: () => void;
 }) {
+  const [src, setSrc] = useState(entry.photo.thumbnail_url);
+  const [triedFallback, setTriedFallback] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
   return (
-    <div className="group relative aspect-square rounded-xl overflow-hidden bg-gray-100 cursor-pointer">
-      <Image
-        src={entry.photo.thumbnail_url}
-        alt={entry.photo.original_filename}
-        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-        loading="lazy"
-        onClick={onOpen}
-        fill
-      />
+    <div
+      className="group relative aspect-square rounded-xl overflow-hidden bg-gray-100 cursor-pointer"
+      onClick={onOpen}
+    >
+      {!imgError ? (
+        <Image
+          src={src}
+          alt={entry.photo.original_filename}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
+          onError={() => {
+            if (!triedFallback && entry.photo.fallback_url) {
+              setTriedFallback(true);
+              setSrc(entry.photo.fallback_url);
+              return;
+            }
+            setImgError(true);
+          }}
+          fill
+        />
+      ) : (
+        <div
+          className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300"
+          aria-label="Open photo"
+        >
+          <svg
+            className="w-8 h-8"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14"
+            />
+          </svg>
+        </div>
+      )}
       {/* Hover overlay */}
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors">
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1.5">
