@@ -80,6 +80,7 @@ export function eventIdFromStorageKey(storageKey: string): string {
 const IMAGEKIT_ENDPOINT =
   process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT ??
   process.env.EXPO_PUBLIC_IMAGEKIT_URL_ENDPOINT ??
+  process.env.EXPO_PUBLIC_IMAGEKIT_URL ??
   "";
 
 /**

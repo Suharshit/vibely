@@ -14,7 +14,6 @@
 
 import { use, useState, useEffect } from "react";
 import Link from "next/link";
-import { previewUrl } from "@shared/utils/storage";
 import Image from "next/image";
 
 type PageProps = { params: Promise<{ id: string }> };
@@ -29,6 +28,8 @@ interface PhotoDetail {
   status: string;
   saved_by_me: boolean;
   is_mine: boolean;
+  preview_url: string;
+  fallback_url: string | null;
   uploader: { id: string; name: string; avatar_url: string | null } | null;
   guest_uploader: { display_name: string } | null;
   event: { id: string; title: string; event_date: string } | null;
@@ -58,6 +59,8 @@ export default function PhotoDetailPage({ params }: PageProps) {
   const [saved, setSaved] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
+  const [triedFallback, setTriedFallback] = useState(false);
 
   useEffect(() => {
     fetch(`/api/photos/${id}`)
@@ -69,6 +72,8 @@ export default function PhotoDetailPage({ params }: PageProps) {
         }
         setPhoto(data.photo);
         setSaved(data.photo.saved_by_me);
+        setImgSrc(data.photo.preview_url);
+        setTriedFallback(false);
       })
       .catch(() => setError("Failed to load photo"))
       .finally(() => setIsLoading(false));
@@ -155,12 +160,19 @@ export default function PhotoDetailPage({ params }: PageProps) {
           </div>
         )}
         <Image
-          src={previewUrl(photo.storage_key)}
+          src={imgSrc ?? photo.preview_url}
           alt={photo.original_filename}
           className={`max-w-full max-h-[85vh] object-contain rounded-xl transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
           width={800}
           height={600}
           onLoad={() => setImgLoaded(true)}
+          onError={() => {
+            if (!triedFallback && photo.fallback_url) {
+              setTriedFallback(true);
+              setImgLoaded(false);
+              setImgSrc(photo.fallback_url);
+            }
+          }}
         />
       </div>
 

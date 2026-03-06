@@ -21,6 +21,7 @@
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { formatEventDate } from "@shared/utils/invite";
 
@@ -143,10 +144,12 @@ export default function JoinEventPage({ params }: PageProps) {
           {/* Cover */}
           <div className="h-32 bg-linear-to-br from-violet-200 to-pink-100">
             {event.cover_image_url && (
-              <img
+              <Image
                 src={event.cover_image_url}
                 alt={event.title}
                 className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 100vw, 448px"
               />
             )}
           </div>
@@ -154,10 +157,12 @@ export default function JoinEventPage({ params }: PageProps) {
           <div className="p-6">
             <div className="flex items-center gap-2 mb-1">
               {event.host.avatar_url ? (
-                <img
+                <Image
                   src={event.host.avatar_url}
                   alt=""
                   className="w-5 h-5 rounded-full"
+                  width={20}
+                  height={20}
                 />
               ) : (
                 <div className="w-5 h-5 rounded-full bg-violet-100 flex items-center justify-center text-xs text-violet-700 font-medium">

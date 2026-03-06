@@ -15,6 +15,7 @@ export interface VaultPhoto {
     created_at: string;
     thumbnail_url: string;
     preview_url: string;
+    fallback_url: string | null;
     event: { id: string; title: string; event_date: string } | null;
     uploader: { id: string; name: string; avatar_url: string | null } | null;
   };

@@ -6,6 +6,7 @@
 
 import { use } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useEvent } from "@/hooks/useEvents";
 import { usePhotos } from "@/hooks/usePhotos";
 import { QRCodeDisplay } from "@/components/events/QRCodeDisplay";
@@ -74,10 +75,12 @@ export default function EventDetailPage({ params }: PageProps) {
       {/* Cover banner */}
       <div className="h-48 sm:h-64 bg-gradient-to-br from-violet-200 via-purple-100 to-pink-100 relative">
         {event.cover_image_url && (
-          <img
+          <Image
             src={event.cover_image_url}
             alt={event.title}
             className="w-full h-full object-cover"
+            fill
+            sizes="100vw"
           />
         )}
         <Link
@@ -175,10 +178,12 @@ export default function EventDetailPage({ params }: PageProps) {
                   <div key={member.id} className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
                       {member.user?.avatar_url ? (
-                        <img
+                        <Image
                           src={member.user.avatar_url}
                           alt=""
                           className="w-8 h-8 rounded-full object-cover"
+                          width={32}
+                          height={32}
                         />
                       ) : (
                         <span className="text-xs font-medium text-violet-700">

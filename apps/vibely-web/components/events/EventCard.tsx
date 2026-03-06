@@ -9,6 +9,7 @@
 // ============================================================
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   formatEventDate,
   relativeTime,
@@ -44,10 +45,12 @@ export function EventCard({ event, onDelete }: EventCardProps) {
       {/* Cover image or gradient placeholder */}
       <div className="h-32 bg-linear-to-br from-violet-100 via-purple-50 to-pink-100 relative overflow-hidden">
         {event.cover_image_url && (
-          <img
+          <Image
             src={event.cover_image_url}
             alt={event.title}
             className="w-full h-full object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, 384px"
           />
         )}
 
