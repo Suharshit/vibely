@@ -1,7 +1,7 @@
 // ============================================================
-// apps/web/middleware.ts
+// apps/web/proxy.ts
 // ============================================================
-// WHY does Next.js need middleware for auth?
+// WHY does Next.js need proxy for auth?
 // Supabase issues JWTs that expire every hour. When a JWT expires,
 // the Supabase client automatically uses the refresh token to get
 // a new JWT — but this only happens in client-side code by default.
@@ -11,7 +11,7 @@
 // Server Component would see them as logged out even though they
 // have a valid refresh token.
 //
-// The middleware runs on EVERY request, BEFORE rendering. It
+// The proxy runs on EVERY request, BEFORE rendering. It
 // silently refreshes the session if needed, then writes the new
 // tokens to cookies. By the time Server Components render, the
 // session is fresh.
@@ -21,7 +21,7 @@
 // we centralize protected route logic here. One place to maintain,
 // consistent behavior everywhere.
 //
-// IMPORTANT: The middleware file MUST live at the root of your app
+// IMPORTANT: The proxy file MUST live at the root of your app
 // (same level as app/), NOT inside the app/ directory.
 // ============================================================
 
@@ -35,7 +35,7 @@ const PROTECTED_ROUTES = ["/dashboard", "/events", "/vault", "/profile"];
 // (e.g. don't show login page to someone already logged in)
 const AUTH_ROUTES = ["/login", "/signup"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // We must return this response object and have Supabase mutate
   // it (add/update cookies) rather than creating a new response
   // mid-flight. Creating a new response would lose the cookies.
@@ -50,7 +50,7 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          // Step 1: write to request (so later middleware can read them)
+          // Step 1: write to request (so later proxy can read them)
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
@@ -104,7 +104,7 @@ export async function middleware(request: NextRequest) {
   return supabaseResponse;
 }
 
-// The matcher tells Next.js which routes to run middleware on.
+// The matcher tells Next.js which routes to run proxy on.
 // We exclude static assets and Next internals for performance.
 // The regex: match everything EXCEPT _next/static, _next/image,
 // favicon.ico, and common image extensions.

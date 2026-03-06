@@ -75,14 +75,15 @@ export async function GET() {
   // fetch directly from a private bucket.
   const signedByPath = new Map<string, string>();
   const storageKeys = validEntries
-    .map((entry) => (entry.photo as { storage_key?: string } | null)?.storage_key)
+    .map(
+      (entry) => (entry.photo as { storage_key?: string } | null)?.storage_key
+    )
     .filter((key): key is string => !!key);
 
   if (storageKeys.length > 0) {
-    const { data: signedData, error: signedError } =
-      await adminSupabase.storage
-        .from("event-photos")
-        .createSignedUrls(storageKeys, 60 * 60);
+    const { data: signedData, error: signedError } = await adminSupabase.storage
+      .from("event-photos")
+      .createSignedUrls(storageKeys, 60 * 60);
 
     if (signedError) {
       console.error("[GET /api/vault] signed URL error", signedError);

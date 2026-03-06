@@ -245,7 +245,6 @@ export function PhotoGallery({
           </button>
         </div>
       )}
-
     </>
   );
 }
