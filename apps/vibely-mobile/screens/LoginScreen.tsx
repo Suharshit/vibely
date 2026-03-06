@@ -31,10 +31,10 @@ import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAuth } from "@/context/AuthContext";
-import type { RootStackParamList } from "@/navigation/types";
+import type { AppStackParamList } from "@/navigation/types";
 
 type LoginNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+  AppStackParamList,
   "Login"
 >;
 
@@ -134,7 +134,7 @@ export default function LoginScreen() {
           {/* Footer */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
+            <TouchableOpacity onPress={() => navigation.navigate("Register")}>
               <Text style={styles.footerLink}>Create one</Text>
             </TouchableOpacity>
           </View>

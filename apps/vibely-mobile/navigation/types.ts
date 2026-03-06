@@ -1,20 +1,26 @@
 // ============================================================
-// apps/mobile/navigation/types.ts  (updated for Phase 8)
+// apps/mobile/navigation/types.ts  (updated Phase 10)
 // ============================================================
 
-export type AuthStackParamList = {
-  Login: undefined;
-  Signup: undefined;
-};
-
 export type AppStackParamList = {
+  // Auth
+  Login: undefined;
+  Register: undefined;
+
+  // Main tabs
   Dashboard: undefined;
+  Vault: undefined;
+  Profile: undefined;
+
+  // Event stack
   EventDetail: { eventId: string };
   EventCreate: undefined;
-  JoinEvent: { token?: string }; // token is optional — user can type it
-  GuestUpload: { token: string }; // Phase 10
-  Vault: undefined; // Phase 11
-  Profile: undefined;
-};
+  EditEvent: { eventId: string };
+  JoinEvent: undefined;
 
-export type RootStackParamList = AuthStackParamList & AppStackParamList;
+  // Photo
+  PhotoDetail: { photoId: string };
+
+  // Guest
+  GuestUpload: { inviteToken: string };
+};

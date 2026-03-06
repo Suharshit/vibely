@@ -1,28 +1,113 @@
-import { NextRequest, NextResponse } from "next/server";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// ============================================================
+// apps/web/app/api/vault/route.ts
+// ============================================================
+// GET /api/vault
+//
+// Returns all photos the authenticated user has saved to their
+// personal vault, grouped by event, with ImageKit URLs.
+//
+// WHY group by event?
+// Vault photos come from multiple events. Rendering them in a
+// flat grid loses context ("where is this photo from?").
+// Grouping by event makes the vault browsable and meaningful.
+// ============================================================
 
-/**
- * GET /api/vault
- * Get all photos in user's personal vault
- */
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "20");
+import { NextResponse } from "next/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { thumbnailUrl, previewUrl } from "@shared/utils/storage";
 
-    // TODO: Implement get vault
-    // 1. Verify authentication
-    // 2. Fetch user's vault photos from database
-    // 3. Return paginated photos with ImageKit URLs
+export async function GET(request: Request) {
+  const supabase = await createClient();
+  const adminSupabase = createAdminClient();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Fetch vault entries with full photo + event info
+  const { data: vaultEntries, error } = await adminSupabase
+    .from("personal_vault")
+    .select(
+      `
+      id,
+      saved_at,
+      photo:photos (
+        id,
+        storage_key,
+        original_filename,
+        file_size,
+        created_at,
+        uploaded_by_user,
+        uploaded_by_guest,
+        status,
+        event:events (
+          id,
+          title,
+          event_date
+        ),
+        uploader:users!uploaded_by_user (
+          id, name, avatar_url
+        )
+      )
+    `
+    )
+    .eq("user_id", user.id)
+    .eq("photo.status", "active") // exclude deleted photos
+    .order("saved_at", { ascending: false });
+
+  if (error) {
+    console.error("[GET /api/vault]", error);
     return NextResponse.json(
-      { message: "Get vault endpoint - Not implemented yet" },
-      { status: 501 }
-    );
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Failed to fetch vault" },
       { status: 500 }
     );
   }
+
+  // Filter out entries where the photo was deleted (status filter above
+  // may not work perfectly on joined tables in all Supabase versions)
+  const validEntries = (vaultEntries ?? []).filter((e) => e.photo !== null);
+
+  // Augment with ImageKit URLs
+  const augmented = validEntries.map((entry) => {
+    const photo = entry.photo as any;
+    return {
+      vault_entry_id: entry.id,
+      saved_at: entry.saved_at,
+      photo: {
+        ...photo,
+        thumbnail_url: thumbnailUrl(photo.storage_key),
+        preview_url: previewUrl(photo.storage_key),
+      },
+    };
+  });
+
+  // Group by event for the UI
+  const byEvent: Record<
+    string,
+    {
+      event: { id: string; title: string; event_date: string };
+      photos: typeof augmented;
+    }
+  > = {};
+
+  for (const entry of augmented) {
+    const photo = entry.photo as any;
+    const event = photo.event;
+    if (!event) continue;
+    if (!byEvent[event.id]) {
+      byEvent[event.id] = { event, photos: [] };
+    }
+    byEvent[event.id].photos.push(entry);
+  }
+
+  return NextResponse.json({
+    total: augmented.length,
+    groups: Object.values(byEvent),
+    // Also return flat list for simple grid view
+    photos: augmented,
+  });
 }

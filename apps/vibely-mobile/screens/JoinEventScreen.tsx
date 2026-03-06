@@ -39,7 +39,7 @@ export default function JoinEventScreen() {
 
   // Token may come from a deep link param or the user types it
   const [token, setToken] = useState(
-    (route.params as { token?: string })?.token ?? ""
+    (route.params as unknown as { token?: string })?.token ?? ""
   );
   const [isLoading, setIsLoading] = useState(false);
 
