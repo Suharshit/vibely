@@ -1,107 +1,90 @@
-import { EXPO_PUBLIC_API_URL } from "@env";
+// ============================================================
+// apps/mobile/lib/api.ts
+// ============================================================
+// Generic API client for calling the Next.js API from mobile.
+//
+// Auth is handled by reading the current Supabase session and
+// passing the JWT as a Bearer token. This ensures the Next.js
+// API route handlers can call supabase.auth.getUser() and get
+// the correct user — exactly like browser cookie-based auth.
+//
+// NOTE: Most reads go directly to Supabase (see useEvents.ts).
+// This client is used for API routes that require the service
+// role key (photo uploads, guest sessions, etc.).
+// ============================================================
+
+import { supabase } from "@/lib/supabase/client";
+
+const API_BASE = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000";
 
 /**
- * API Client for mobile app
- * Communicates with Next.js API routes
+ * Retrieve the current access token from the Supabase session.
+ * Returns an empty string if not authenticated.
  */
+async function getAccessToken(): Promise<string> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  return session?.access_token ?? "";
+}
 
 class ApiClient {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = EXPO_PUBLIC_API_URL || "http://localhost:3000/api";
+    this.baseUrl = `${API_BASE}/api`;
   }
 
   /**
-   * Make authenticated request
+   * Make an authenticated request to the Next.js API.
    */
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    try {
-      const url = `${this.baseUrl}${endpoint}`;
+    const url = `${this.baseUrl}${endpoint}`;
+    const token = await getAccessToken();
 
-      // TODO: Add authentication token from storage
-      const headers = {
-        "Content-Type": "application/json",
-        ...options.headers,
-      };
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers as Record<string, string>),
+    };
 
-      const response = await fetch(url, {
-        ...options,
-        headers,
-      });
+    const response = await fetch(url, { ...options, headers });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "API request failed");
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("API Error:", error);
-      throw error;
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      throw new Error(
+        (body as { error?: string }).error ??
+          `API request failed (${response.status})`
+      );
     }
+
+    return (await response.json()) as T;
   }
 
-  /**
-   * GET request
-   */
+  /** GET request */
   async get<T>(endpoint: string): Promise<T> {
     return this.request<T>(endpoint, { method: "GET" });
   }
 
-  /**
-   * POST request
-   */
-  async post<T>(endpoint: string, data: any): Promise<T> {
+  /** POST request */
+  async post<T>(endpoint: string, data: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: "POST",
       body: JSON.stringify(data),
     });
   }
 
-  /**
-   * PATCH request
-   */
-  async patch<T>(endpoint: string, data: any): Promise<T> {
+  /** PATCH request */
+  async patch<T>(endpoint: string, data: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: "PATCH",
       body: JSON.stringify(data),
     });
   }
 
-  /**
-   * DELETE request
-   */
+  /** DELETE request */
   async delete<T>(endpoint: string): Promise<T> {
     return this.request<T>(endpoint, { method: "DELETE" });
-  }
-
-  /**
-   * Upload file (multipart/form-data)
-   */
-  async uploadFile<T>(endpoint: string, formData: FormData): Promise<T> {
-    try {
-      const url = `${this.baseUrl}${endpoint}`;
-
-      // TODO: Add authentication token
-      const response = await fetch(url, {
-        method: "POST",
-        body: formData,
-        headers: {
-          // Don't set Content-Type for FormData - fetch will set it with boundary
-        },
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Upload failed");
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("Upload Error:", error);
-      throw error;
-    }
   }
 }
 
