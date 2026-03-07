@@ -20,13 +20,11 @@
 //           └── Profile (tab root)
 // ============================================================
 
-import { useEffect, useState } from "react";
-import { NavigationContainer } from "@react-navigation/native";
+// import { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Text, View } from "react-native";
-import { supabase } from "@/lib/supabase/client";
-import type { Session } from "@supabase/supabase-js";
+import { useAuth } from "@/context/AuthContext";
 
 // Auth screens
 import LoginScreen from "@/screens/LoginScreen";
@@ -151,36 +149,20 @@ function MainTabs() {
 // ── Root navigator ────────────────────────────────────────────
 
 export default function RootNavigator() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [isChecking, setIsChecking] = useState(true);
+  const { isAuthenticated, isLoading } = useAuth();
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setIsChecking(false);
-    });
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
-
-  if (isChecking) return null; // Splash screen handles this
+  if (isLoading) return null; // Splash screen handles this
 
   return (
-    <NavigationContainer>
-      <RootStack.Navigator screenOptions={{ headerShown: false }}>
-        {session ? (
-          <RootStack.Screen name="Main" component={MainTabs} />
-        ) : (
-          <>
-            <RootStack.Screen name="Login" component={LoginScreen} />
-            <RootStack.Screen name="Register" component={RegisterScreen} />
-          </>
-        )}
-      </RootStack.Navigator>
-    </NavigationContainer>
+    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+      {isAuthenticated ? (
+        <RootStack.Screen name="Main" component={MainTabs} />
+      ) : (
+        <>
+          <RootStack.Screen name="Login" component={LoginScreen} />
+          <RootStack.Screen name="Register" component={RegisterScreen} />
+        </>
+      )}
+    </RootStack.Navigator>
   );
 }

@@ -55,7 +55,7 @@ const COMPRESS_OPTIONS: ImageManipulator.Action[] = [
 const COMPRESS_QUALITY = 0.82;
 
 export function PhotoUploadButton({
-  eventId,
+  eventId: _eventId,
   onUpload,
   guestToken,
   disabled = false,
@@ -156,7 +156,7 @@ export function PhotoUploadButton({
 // ── Compact icon-only version for toolbars ────────────────────
 
 export function PhotoUploadIcon({
-  eventId,
+  eventId: _eventId,
   onUpload,
   guestToken,
   disabled,

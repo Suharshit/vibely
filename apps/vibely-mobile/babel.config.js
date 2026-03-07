@@ -13,17 +13,17 @@ module.exports = function (api) {
           path: ".env",
         },
       ],
-      "react-native-reanimated/plugin",
       [
         "module-resolver",
         {
           root: ["./"],
           alias: {
             "@": "./",
-            "@shared": "../../packages/shared",
+            "@shared": "../../packages/shared/src",
           },
         },
       ],
+      "react-native-reanimated/plugin",
     ],
   };
 };

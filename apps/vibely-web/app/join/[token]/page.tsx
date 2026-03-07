@@ -142,7 +142,7 @@ export default function JoinEventPage({ params }: PageProps) {
         {/* Event preview card */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-4">
           {/* Cover */}
-          <div className="h-32 bg-linear-to-br from-violet-200 to-pink-100">
+          <div className="relative h-32 bg-linear-to-br from-violet-200 to-pink-100">
             {event.cover_image_url && (
               <Image
                 src={event.cover_image_url}

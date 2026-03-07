@@ -22,7 +22,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { generateInviteToken, defaultExpiresAt } from "@shared/utils/invite";
+import { generateInviteToken, defaultExpiresAt } from "@shared/utils";
 
 export type EventWithRole = {
   id: string;

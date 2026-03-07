@@ -1,8 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { API_ROUTES } from "@repo/shared/constants";
-import { formatFileSize } from "@repo/shared/utils";
-import { APP_CONFIG } from "@repo/shared/constants";
+import { API_ROUTES, APP_CONFIG } from "@shared/constants";
+import { formatFileSize } from "@shared/utils";
 
 export default function HomeScreen({ navigation }: any) {
   const maxFileSize = formatFileSize(APP_CONFIG.PHOTO.MAX_FILE_SIZE);

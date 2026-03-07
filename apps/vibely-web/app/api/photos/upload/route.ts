@@ -34,6 +34,7 @@ import { NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { uploadInitSchema } from "@shared/validation/photo.schemas";
 import { buildStorageKey, sanitizeFilename } from "@shared/utils/storage";
+import { uploadRateLimit } from "@/lib/utils/rate-limit";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -60,6 +61,15 @@ export async function POST(request: Request) {
 
   const { event_id, filename, content_type, file_size, guest_token } =
     parsed.data;
+
+  // Rate limiting to prevent abuse
+  const rateLimitId = guest_token
+    ? `guest:${guest_token}`
+    : ((await supabase.auth.getUser()).data.user?.id ?? "unknown");
+  const rateLimitResult = await uploadRateLimit(request, rateLimitId);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response!;
+  }
 
   // ── Step 2: Resolve the uploader identity ───────────────────
   // Either an authenticated user OR a guest with a valid session token.

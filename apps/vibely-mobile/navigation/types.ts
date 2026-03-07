@@ -16,7 +16,7 @@ export type AppStackParamList = {
   EventDetail: { eventId: string };
   EventCreate: undefined;
   EditEvent: { eventId: string };
-  JoinEvent: undefined;
+  JoinEvent: { token?: string } | undefined;
 
   // Photo
   PhotoDetail: { photoId: string };

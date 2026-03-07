@@ -1,38 +1,68 @@
 import type { NextConfig } from "next";
 
-const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
-  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
-  : undefined;
-
-const imagekitHostname = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT
-  ? new URL(process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT).hostname
-  : undefined;
-
 const nextConfig: NextConfig = {
+  // ── Turborepo monorepo: transpile shared package ─────────────
+  transpilePackages: ["@repo/shared"],
+
+  // ── Image optimization ────────────────────────────────────────
+  // WHY configure remotePatterns instead of domains?
+  // domains is deprecated in Next.js 13+. remotePatterns is more
+  // specific — you can restrict to exact hostnames and path prefixes.
   images: {
     remotePatterns: [
       {
+        // ImageKit CDN
         protocol: "https",
         hostname: "ik.imagekit.io",
         pathname: "/**",
       },
-      ...(imagekitHostname && imagekitHostname !== "ik.imagekit.io"
-        ? [
-            {
-              protocol: "https" as const,
-              hostname: imagekitHostname,
-              pathname: "/**",
-            },
-          ]
-        : []),
       {
+        // Supabase Storage (avatars and covers are public)
         protocol: "https",
-        hostname: supabaseHostname ?? "example.supabase.co",
-        pathname: "/**",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**",
       },
     ],
   },
-  transpilePackages: ["@repo/shared"],
+
+  // ── Security headers ──────────────────────────────────────────
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          // Prevent browsers from MIME-sniffing
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          // Prevent clickjacking
+          { key: "X-Frame-Options", value: "DENY" },
+          // Control referrer in cross-origin requests
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          // Permissions policy — disable unnecessary browser APIs
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+        ],
+      },
+    ];
+  },
+
+  // ── Redirects ─────────────────────────────────────────────────
+  async redirects() {
+    return [];
+  },
+
+  // ── Build options ─────────────────────────────────────────────
+  // Fail the build on TypeScript errors (good for CI)
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+
+  // ── Experimental ─────────────────────────────────────────────
+  experimental: {
+    // Improves cold start time on Vercel serverless functions
+    serverMinification: true,
+  },
 };
 
 export default nextConfig;

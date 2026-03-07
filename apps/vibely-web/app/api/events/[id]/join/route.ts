@@ -19,6 +19,7 @@
 
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { joinEventRateLimit } from "@/lib/utils/rate-limit";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -34,6 +35,10 @@ export async function POST(request: Request, { params }: RouteParams) {
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // Rate limit check
+  const rl = await joinEventRateLimit(request);
+  if (!rl.success) return rl.response!;
 
   // Parse the invite token from the request body
   let token: string | undefined;

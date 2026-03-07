@@ -224,7 +224,7 @@ export default function GuestUploadPage() {
           <p className="text-center text-xs text-gray-400 mt-6">
             Have an account?{" "}
             <a
-              href="/auth/login"
+              href="/login"
               className="text-violet-600 font-medium hover:underline"
             >
               Sign in to join the event
@@ -277,7 +277,7 @@ export default function GuestUploadPage() {
               Want to save photos to your personal vault?
             </p>
             <a
-              href="/auth/register"
+              href="/signup"
               className="text-xs font-medium text-violet-600 hover:underline"
             >
               Create a free account →

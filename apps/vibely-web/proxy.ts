@@ -1,46 +1,63 @@
 // ============================================================
 // apps/web/proxy.ts
 // ============================================================
-// WHY does Next.js need proxy for auth?
-// Supabase issues JWTs that expire every hour. When a JWT expires,
-// the Supabase client automatically uses the refresh token to get
-// a new JWT — but this only happens in client-side code by default.
+// Next.js proxy runs on every matched request BEFORE the
+// page or API route handler. We use it to:
+//   1. Redirect unauthenticated users away from protected routes
+//   2. Redirect authenticated users away from auth pages
 //
-// In App Router, Server Components render before any client JS
-// runs. So if a user visits a page after their JWT expired, the
-// Server Component would see them as logged out even though they
-// have a valid refresh token.
+// WHY middleware instead of checking auth in every page?
+// Middleware runs at the Edge — before the page JS bundle is
+// even loaded. This means unauthenticated users never see a
+// flash of protected content. It's also one central place to
+// manage auth redirects instead of copy-pasting checks.
 //
-// The proxy runs on EVERY request, BEFORE rendering. It
-// silently refreshes the session if needed, then writes the new
-// tokens to cookies. By the time Server Components render, the
-// session is fresh.
-//
-// WHY does it also handle redirects?
-// Rather than checking auth in every Server Component separately,
-// we centralize protected route logic here. One place to maintain,
-// consistent behavior everywhere.
-//
-// IMPORTANT: The proxy file MUST live at the root of your app
-// (same level as app/), NOT inside the app/ directory.
+// HOW Supabase auth works in middleware:
+// The Supabase SSR package reads the auth cookie from the request
+// and verifies the session. If valid, the user is authenticated.
 // ============================================================
 
 import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 // Routes that require authentication
-const PROTECTED_ROUTES = ["/dashboard", "/events", "/vault", "/profile"];
+const PROTECTED_PREFIXES = [
+  "/dashboard",
+  "/events",
+  "/vault",
+  "/profile",
+  "/photos",
+];
 
-// Routes that should redirect authenticated users AWAY
-// (e.g. don't show login page to someone already logged in)
-const AUTH_ROUTES = ["/login", "/signup"];
+// Routes only for unauthenticated users
+const AUTH_ONLY_ROUTES = ["/login", "/signup"];
+
+// Routes that are always public (no redirect either way)
+const PUBLIC_ROUTES = [
+  "/join", // invite landing page
+  "/guest", // guest upload page
+];
 
 export async function proxy(request: NextRequest) {
-  // We must return this response object and have Supabase mutate
-  // it (add/update cookies) rather than creating a new response
-  // mid-flight. Creating a new response would lose the cookies.
-  let supabaseResponse = NextResponse.next({ request });
+  const { pathname } = request.nextUrl;
 
+  // Skip middleware for static files and API routes
+  // (API routes handle their own auth)
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.includes(".")
+  ) {
+    return NextResponse.next();
+  }
+
+  // Build a response to pass cookies through
+  const response = NextResponse.next({
+    request: { headers: request.headers },
+  });
+
+  // Create Supabase client that can read/write cookies
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -49,67 +66,44 @@ export async function proxy(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
-          // Step 1: write to request (so later proxy can read them)
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          // Step 2: rebuild the response with updated request
-          supabaseResponse = NextResponse.next({ request });
-          // Step 3: write to response (so the browser receives them)
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
+        setAll(cookies) {
+          cookies.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value);
+            response.cookies.set(name, value, options);
+          });
         },
       },
     }
   );
 
-  // DO NOT add any code between createServerClient and getUser().
-  // The auth token refresh is triggered inside getUser() — anything
-  // between them could interfere with the cookie timing.
-  //
-  // We use getUser() not getSession() because getUser() re-validates
-  // the JWT against Supabase's server. getSession() trusts the
-  // cookie blindly without re-validation — a security risk.
+  // Refresh session (extends expiry) and get current user
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
+  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
+  const isAuthOnly = AUTH_ONLY_ROUTES.some((p) => pathname.startsWith(p));
+  const isPublic = PUBLIC_ROUTES.some((p) => pathname.startsWith(p));
 
-  // ── Guard: redirect unauthenticated users from protected routes ─
-  const isProtected = PROTECTED_ROUTES.some((route) =>
-    pathname.startsWith(route)
-  );
+  // Public routes — no redirect
+  if (isPublic) return response;
 
+  // Unauthenticated user trying to access a protected route
   if (isProtected && !user) {
     const loginUrl = new URL("/login", request.url);
-    // Remember where they were trying to go so we can redirect
-    // them there after a successful login.
-    loginUrl.searchParams.set("redirectTo", pathname);
+    loginUrl.searchParams.set("redirectTo", pathname); // redirect back after login
     return NextResponse.redirect(loginUrl);
   }
 
-  // ── Guard: redirect authenticated users away from auth pages ────
-  const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
-
-  if (isAuthRoute && user) {
+  // Authenticated user trying to access auth pages
+  if (isAuthOnly && user) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // IMPORTANT: Always return supabaseResponse, never a new
-  // NextResponse. The cookies Supabase set above live on
-  // supabaseResponse — losing them breaks the auth session.
-  return supabaseResponse;
+  return response;
 }
 
-// The matcher tells Next.js which routes to run proxy on.
-// We exclude static assets and Next internals for performance.
-// The regex: match everything EXCEPT _next/static, _next/image,
-// favicon.ico, and common image extensions.
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  // Run proxy on all routes except static assets
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
