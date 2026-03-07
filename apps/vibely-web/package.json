@@ -16,8 +16,8 @@
     "browser-image-compression": "^2.0.2",
     "next": "16.1.6",
     "qrcode.react": "^4.2.0",
-    "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
