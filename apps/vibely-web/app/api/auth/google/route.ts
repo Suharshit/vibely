@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 /**
  * POST /api/auth/google
  * OAuth login with Google
  */
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // TODO: Implement Google OAuth with Supabase
     // 1. Initiate OAuth flow with Supabase
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       { message: "Google OAuth endpoint - Not implemented yet" },
       { status: 501 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -52,7 +52,7 @@ async function getAuthAndMembership(eventId: string) {
 
 export async function GET(_req: Request, { params }: RouteParams) {
   const { id } = await params;
-  const { error, status, supabase, user, membership } =
+  const { error, status, supabase, membership } =
     await getAuthAndMembership(id);
 
   if (error) return NextResponse.json({ error }, { status });

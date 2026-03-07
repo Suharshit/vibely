@@ -10,8 +10,7 @@ export async function PATCH(
 ) {
   try {
     const { id, userId } = await params;
-    const body = await request.json();
-    const { role } = body;
+    await request.json();
 
     // TODO: Implement update member role
     // 1. Verify authentication
@@ -26,7 +25,7 @@ export async function PATCH(
       },
       { status: 501 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -39,7 +38,7 @@ export async function PATCH(
  * Remove member from event
  */
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   try {
@@ -58,7 +57,7 @@ export async function DELETE(
       },
       { status: 501 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

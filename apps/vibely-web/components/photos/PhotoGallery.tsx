@@ -12,6 +12,7 @@
 // ============================================================
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { GalleryPhoto } from "@/hooks/usePhotos";
 import Image from "next/image";
 
@@ -37,7 +38,10 @@ export function PhotoCard({
   const [triedFallback, setTriedFallback] = useState(false);
 
   return (
-    <div className="group relative aspect-square rounded-xl overflow-hidden bg-gray-100 cursor-pointer">
+    <div
+      className="group relative aspect-square rounded-xl overflow-hidden bg-gray-100 cursor-pointer"
+      onClick={() => onOpen(photo)}
+    >
       {/* Thumbnail */}
       {!imgError ? (
         <Image
@@ -55,14 +59,10 @@ export function PhotoCard({
             }
             setImgError(true);
           }}
-          onClick={() => onOpen(photo)}
         />
       ) : (
         // Fallback when ImageKit isn't configured yet
-        <div
-          className="w-full h-full flex items-center justify-center bg-gray-100"
-          onClick={() => onOpen(photo)}
-        >
+        <div className="w-full h-full flex items-center justify-center bg-gray-100">
           <svg
             className="w-8 h-8 text-gray-300"
             fill="none"
@@ -178,7 +178,7 @@ export function PhotoGallery({
   onUnsave,
   onDelete,
 }: PhotoGalleryProps) {
-  const [lightboxPhoto, setLightboxPhoto] = useState<GalleryPhoto | null>(null);
+  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -216,7 +216,7 @@ export function PhotoGallery({
             onSave={onSave}
             onUnsave={onUnsave}
             onDelete={onDelete}
-            onOpen={setLightboxPhoto}
+            onOpen={(openedPhoto) => router.push(`/photos/${openedPhoto.id}`)}
           />
         ))}
       </div>
@@ -245,120 +245,6 @@ export function PhotoGallery({
           </button>
         </div>
       )}
-
-      {/* Lightbox */}
-      {lightboxPhoto && (
-        <Lightbox
-          photo={lightboxPhoto}
-          onClose={() => setLightboxPhoto(null)}
-          onSave={onSave}
-          onUnsave={onUnsave}
-        />
-      )}
     </>
-  );
-}
-
-// ── Lightbox ──────────────────────────────────────────────────
-
-interface LightboxProps {
-  photo: GalleryPhoto;
-  onClose: () => void;
-  onSave: (id: string) => void;
-  onUnsave: (id: string) => void;
-}
-
-function Lightbox({ photo, onClose, onSave, onUnsave }: LightboxProps) {
-  const [src, setSrc] = useState(photo.preview_url);
-  const [triedFallback, setTriedFallback] = useState(false);
-
-  return (
-    // Trap focus and handle escape key for accessibility
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
-      onClick={onClose}
-      onKeyDown={(e) => e.key === "Escape" && onClose()}
-      tabIndex={-1}
-    >
-      <div
-        className="relative max-w-4xl max-h-[90vh] w-full mx-4"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Image
-          src={src}
-          alt={photo.original_filename}
-          className="w-full h-full object-contain rounded-xl"
-          width={1200}
-          height={1200}
-          onError={() => {
-            if (!triedFallback && photo.fallback_url) {
-              setTriedFallback(true);
-              setSrc(photo.fallback_url);
-            }
-          }}
-        />
-
-        {/* Controls */}
-        <div className="absolute top-3 right-3 flex gap-2">
-          <button
-            onClick={() =>
-              photo.saved_by_me ? onUnsave(photo.id) : onSave(photo.id)
-            }
-            className={`p-2 rounded-xl backdrop-blur-sm transition-colors ${
-              photo.saved_by_me
-                ? "bg-amber-400/90 text-white"
-                : "bg-white/20 text-white hover:bg-white/30"
-            }`}
-          >
-            <svg
-              className="w-5 h-5"
-              fill={photo.saved_by_me ? "currentColor" : "none"}
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-              />
-            </svg>
-          </button>
-
-          <button
-            onClick={onClose}
-            className="p-2 rounded-xl bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm transition-colors"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* Uploader + filename */}
-        <div className="absolute bottom-3 left-3 right-3">
-          <div className="bg-black/40 backdrop-blur-sm rounded-xl px-3 py-2">
-            <p className="text-xs text-white/90 truncate">
-              {photo.original_filename}
-            </p>
-            {photo.uploader && (
-              <p className="text-xs text-white/60 mt-0.5">
-                by {photo.uploader.name}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }

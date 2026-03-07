@@ -11,6 +11,15 @@
       "resizeMode": "contain",
       "backgroundColor": "#0ea5e9"
     },
+    "plugins": [
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow Vibely to save photos to your library.",
+          "savePhotosPermission": "Allow Vibely to save photos."
+        }
+      ]
+    ],
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
@@ -21,7 +30,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0ea5e9"
       },
-      "package": "com.yourcompany.vibely"
+      "package": "com.yourcompany.vibely",
+      "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
     },
     "web": {
       "favicon": "./assets/favicon.png"

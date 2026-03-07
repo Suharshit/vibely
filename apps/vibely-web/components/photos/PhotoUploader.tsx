@@ -9,11 +9,7 @@
 // ============================================================
 
 import { useRef, useState, useCallback } from "react";
-import {
-  validateImageFile,
-  MAX_FILE_SIZE_BYTES,
-  ALLOWED_MIME_TYPES,
-} from "@shared/utils/storage";
+import { validateImageFile, ALLOWED_MIME_TYPES } from "@shared/utils/storage";
 import type { UploadItem } from "@/hooks/usePhotos";
 
 interface PhotoUploaderProps {

@@ -1,25 +1,23 @@
+// ============================================================
+// apps/web/app/layout.tsx
+// ============================================================
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { NavBar } from "@/components/layout/NavBar";
+import { ToastProvider } from "@/components/layout/Toast";
 import { AuthProvider } from "@/context/AuthContext";
-
-// Force all pages using this layout to be rendered dynamically at request
-// time, not statically at build time. This prevents prerendering from
-// attempting to initialise the Supabase client (which requires env vars
-// that are intentionally absent during CI builds).
-export const dynamic = "force-dynamic";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Vibely - Event Photo Sharing",
+  title: "Vibely — Share event photos instantly",
   description:
-    "Event-centric photo sharing platform for seamless event photography",
-  keywords: ["events", "photos", "sharing", "QR code", "upload", "vibely"],
-  authors: [{ name: "Your Name" }],
+    "Create events, share a QR code, and collect photos from everyone — no app required for guests.",
   openGraph: {
-    title: "Vibely - Event Photo Sharing",
-    description: "Share event photos effortlessly",
+    title: "Vibely",
+    description: "Share event photos instantly — no app required for guests.",
     type: "website",
   },
 };
@@ -31,9 +29,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body
+        className={`${inter.className} bg-gray-50 text-gray-900 antialiased`}
+      >
         <AuthProvider>
-          <main className="min-h-screen bg-gray-50">{children}</main>
+          <ToastProvider>
+            <NavBar />
+            <main>{children}</main>
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>

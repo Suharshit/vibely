@@ -25,7 +25,9 @@
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:status": "supabase status",
-    "supabase:gen-types": "supabase gen types typescript --local > packages/types/supabase.ts"
+    "supabase:gen-types": "supabase gen types typescript --linked > packages/types/supabase.ts",
+    "supabase:deploy-functions": "supabase functions deploy",
+    "supabase:deploy-cleanup": "supabase functions deploy cleanup-deleted-photos"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
@@ -53,6 +55,7 @@
     "pnpm": ">=8.0.0"
   },
   "dependencies": {
+    "expo": "~55.0.4",
     "nanoid": "^5.1.6",
     "zod": "^3.22.4"
   }

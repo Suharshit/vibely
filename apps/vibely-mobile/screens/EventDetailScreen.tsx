@@ -24,11 +24,7 @@ import { usePhotos } from "@/hooks/usePhotos";
 import { PhotoGallery } from "@/components/photos/PhotoGallery";
 import { PhotoUploadButton } from "@/components/photos/PhotoUploadButton";
 import { UploadProgressList } from "@/components/photos/UploadProgressList";
-import {
-  formatEventDate,
-  relativeTime,
-  isEventExpired,
-} from "@shared/utils/invite";
+import { formatEventDate, relativeTime, isEventExpired } from "@shared/utils";
 import type { AppStackParamList } from "@/navigation/types";
 
 type EventDetailRoute = RouteProp<AppStackParamList, "EventDetail">;

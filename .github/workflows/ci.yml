@@ -84,6 +84,11 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    env:
+      # PR checks don't have access to local .env files. Provide safe placeholders
+      # so Next.js can initialize Supabase client code during prerender.
+      NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
     steps:
       - name: Checkout code
         uses: actions/checkout@v6

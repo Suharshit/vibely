@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
  * Get all members of an event
  */
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -20,7 +20,7 @@ export async function GET(
       { message: `Get event ${id} members endpoint - Not implemented yet` },
       { status: 501 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

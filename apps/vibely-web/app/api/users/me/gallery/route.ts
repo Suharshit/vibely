@@ -7,9 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   try {
     // Get pagination params from query string
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "20");
+    new URL(request.url);
 
     // TODO: Implement get user gallery
     // 1. Verify authentication
@@ -20,7 +18,7 @@ export async function GET(request: NextRequest) {
       { message: "Get user gallery endpoint - Not implemented yet" },
       { status: 501 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

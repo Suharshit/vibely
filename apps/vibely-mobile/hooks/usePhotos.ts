@@ -14,10 +14,10 @@
 // API — the API holds our service role key, mobile never does.
 // ============================================================
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import * as FileSystem from "expo-file-system/legacy";
 import { supabase } from "@/lib/supabase/client";
-import { thumbnailUrl, previewUrl } from "@shared/utils/storage";
+import { thumbnailUrl, previewUrl } from "@shared/utils";
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -53,6 +53,7 @@ export function usePhotos(eventId: string) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [uploads, setUploads] = useState<MobileUploadItem[]>([]);
+  const uploadIndexRef = useRef(0);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
 
@@ -108,7 +109,7 @@ export function usePhotos(eventId: string) {
       fileSize: number,
       guestToken?: string
     ) => {
-      const index = uploads.length;
+      const index = uploadIndexRef.current++;
 
       // Add upload item to list
       setUploads((prev) => [
@@ -226,7 +227,7 @@ export function usePhotos(eventId: string) {
         });
       }
     },
-    [eventId, uploads.length]
+    [eventId]
   );
 
   // ── Save / Unsave ─────────────────────────────────────────

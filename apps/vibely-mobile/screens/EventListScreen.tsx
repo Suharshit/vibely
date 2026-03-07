@@ -25,7 +25,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEvents } from "@/hooks/useEvents";
 import { useAuth } from "@/context/AuthContext";
-import { relativeTime, isEventExpired } from "@shared/utils/invite";
+import { relativeTime, isEventExpired } from "@shared/utils";
 import type { AppStackParamList } from "@/navigation/types";
 
 type Nav = NativeStackNavigationProp<AppStackParamList>;
