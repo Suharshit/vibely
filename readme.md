@@ -1,190 +1,333 @@
+<div align="center">
+
+<img src="https://img.shields.io/badge/version-1.0.0-7c3aed?style=flat-square" />
+<img src="https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js" />
+<img src="https://img.shields.io/badge/Expo-SDK%2051-000020?style=flat-square&logo=expo" />
+<img src="https://img.shields.io/badge/TypeScript-strict-3178c6?style=flat-square&logo=typescript" />
+<img src="https://img.shields.io/badge/Supabase-powered-3ecf8e?style=flat-square&logo=supabase" />
+<img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" />
+
+<br />
+<br />
+
 # 📸 Vibely
 
-> An event-centric photo sharing platform enabling seamless photo uploads and sharing for events without requiring guest accounts.
+**Event-centric photo sharing — no app required for guests.**
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org/)
-[![Expo](https://img.shields.io/badge/Expo-SDK%2050-000020.svg)](https://expo.dev/)
-[![Turborepo](https://img.shields.io/badge/Turborepo-2.0-EF4444.svg)](https://turbo.build/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+Hosts create an event, share a QR code, and guests upload photos instantly from their phone browser. No sign-up, no friction. Photos auto-expire after the event unless saved to a personal vault.
 
-## 🌟 Features
+[Live Demo](https://vibely.vercel.app) · [Report a Bug](https://github.com/Suharshit/vibely/issues/new?template=bug_report.md) · [Request a Feature](https://github.com/Suharshit/vibely/issues/new?template=feature_request.md)
 
-- 🎉 **Event Creation** - Create events with custom details and expiration dates
-- 📱 **QR Code Sharing** - Generate shareable QR codes and invite links
-- 📸 **Guest Uploads** - Allow guests to upload photos without creating accounts
-- 🔒 **Personal Vaults** - Save favorite photos before events expire
-- ⚡ **Auto-Cleanup** - Photos automatically delete after event expiration
-- 🌐 **Cross-Platform** - Seamless experience on web and mobile
+</div>
 
-## 🏗️ Architecture
+---
 
-This is a monorepo containing:
+## ✨ The Problem It Solves
+
+After every event — weddings, birthdays, team offsites — photos end up scattered across a dozen different phones. The host spends days chasing people on WhatsApp for photos that never arrive.
+
+**Vibely fixes this in 3 steps:**
+1. Host creates an event and shares a QR code
+2. Guests scan and upload directly from their browser — no account needed
+3. Everyone sees the full gallery in real time
+
+---
+
+## 🎯 Core Features
+
+| Feature | Description |
+|---|---|
+| **Guest Uploads** | Guests upload photos without creating an account — just scan the QR and enter a name |
+| **Event Gallery** | Real-time photo grid with lightbox preview, hosted on ImageKit CDN |
+| **Personal Vault** | Save favourites across all events before photos expire |
+| **Photo Detail** | Full metadata view — uploader, date, event, download original |
+| **Event Management** | Create, edit, cover image upload, QR code sharing, member management |
+| **User Profiles** | Name, bio, avatar upload, upload stats |
+| **Auto-Expiry** | Photos auto-expire with the event; saved vault photos persist |
+| **Rate Limiting** | Upload and session abuse prevention via Upstash Redis |
+
+---
+
+## 🏗️ Tech Stack
+
+### Monorepo
+| Tool | Purpose |
+|---|---|
+| [Turborepo](https://turbo.build) | Monorepo build system with pipeline caching |
+| [pnpm workspaces](https://pnpm.io/workspaces) | Package management across apps |
+
+### Web (`apps/web`)
+| Tool | Purpose |
+|---|---|
+| [Next.js 14](https://nextjs.org) | App Router, Server Components, API Routes |
+| [Tailwind CSS](https://tailwindcss.com) | Utility-first styling |
+| [TypeScript](https://typescriptlang.org) | Strict mode throughout |
+
+### Mobile (`apps/mobile`)
+| Tool | Purpose |
+|---|---|
+| [Expo SDK 51](https://expo.dev) | React Native with managed workflow |
+| [NativeWind](https://nativewind.dev) | Tailwind for React Native |
+| [React Navigation](https://reactnavigation.org) | Stack + bottom tab navigation |
+| [EAS Build](https://docs.expo.dev/build/introduction/) | Cloud builds for iOS & Android |
+
+### Backend & Infrastructure
+| Tool | Purpose |
+|---|---|
+| [Supabase](https://supabase.com) | PostgreSQL, Auth, Storage, Edge Functions, pg_cron |
+| [ImageKit](https://imagekit.io) | CDN image delivery with real-time transformations |
+| [Upstash Redis](https://upstash.com) | Serverless rate limiting |
+| [Vercel](https://vercel.com) | Web deployment |
+
+### Shared Package (`packages/shared`)
+- Entity types and Zod validation schemas
+- Storage key utilities and ImageKit URL builders
+- Invite token generation (nanoid)
+- API constants and error codes
+
+---
+
+## 📁 Project Structure
 
 ```
 vibely/
 ├── apps/
-│   ├── web/          # Next.js 14 web application (App Router)
-│   └── mobile/       # Expo React Native mobile app
-└── packages/
-    ├── shared/       # Shared TypeScript types, validation, and utilities
-    └── eslint-config/ # Shared ESLint configuration
+│   ├── web/                          # Next.js 14 web app
+│   │   ├── app/                      # App Router pages
+│   │   │   ├── api/                  # 20+ API route handlers
+│   │   │   ├── dashboard/            # Event list
+│   │   │   ├── events/[id]/          # Event detail + edit
+│   │   │   ├── photos/[id]/          # Photo detail
+│   │   │   ├── vault/                # Personal vault
+│   │   │   ├── profile/              # User profile
+│   │   │   └── guest/[token]/        # Guest upload page
+│   │   ├── components/               # Shared UI components
+│   │   ├── hooks/                    # useEvents, usePhotos, useVault, useProfile
+│   │   ├── lib/                      # Supabase client, rate limiter
+│   │   └── middleware.ts             # Auth guard
+│   │
+│   └── mobile/                       # Expo React Native app
+│       ├── screens/                  # All screen components
+│       ├── components/               # Shared RN components
+│       ├── hooks/                    # Mobile-specific hooks
+│       ├── navigation/               # Stack + tab navigators
+│       └── lib/                      # Supabase client, AsyncStorage
+│
+├── packages/
+│   └── shared/                       # Shared TypeScript package
+│       ├── types/                    # Entity type definitions
+│       ├── validation/               # Zod schemas
+│       └── utils/                    # storage, invite helpers
+│
+└── supabase/
+    ├── migrations/                   # 005 migration files
+    └── functions/                    # Edge Functions
 ```
 
-## 🛠️ Tech Stack
-
-### Frontend
-
-- **Web**: Next.js 14 with App Router, Tailwind CSS
-- **Mobile**: Expo (React Native), NativeWind
-- **Language**: TypeScript
-
-### Backend & Infrastructure
-
-- **API**: Next.js API Routes
-- **Database**: PostgreSQL (Supabase)
-- **Authentication**: Supabase Auth (Email + Google OAuth)
-- **Image Storage**: Cloudflare R2
-- **Image Delivery**: ImageKit CDN
-- **Rate Limiting**: Upstash Redis
-- **Cron Jobs**: Vercel Cron
-
-### Development Tools
-
-- **Monorepo**: Turborepo
-- **Package Manager**: pnpm
-- **Linting**: ESLint
-- **Formatting**: Prettier
-- **Type Checking**: TypeScript
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
+- Node.js 20+
+- pnpm 9+
+- Supabase CLI
+- Expo CLI (for mobile)
 
-- Node.js 18.x or higher
-- pnpm 8.x or higher
-- Git
-
-### Installation
-
-1. **Clone the repository**
+### 1. Clone and install
 
 ```bash
-   git clone https://github.com/Suharshit/vibely.git
-   cd vibely
+git clone https://github.com/Suharshit/vibely.git
+cd vibely
+pnpm install
 ```
 
-2. **Install dependencies**
+### 2. Set up Supabase
 
 ```bash
-   pnpm install
+# Start local Supabase
+supabase start
+
+# Run all migrations
+supabase db push
 ```
 
-3. **Set up environment variables**
+### 3. Configure environment variables
 
 ```bash
-   # Copy example env files
-   cp apps/web/.env.example apps/web/.env.local
-   cp apps/mobile/.env.example apps/mobile/.env
+# Web
+cp apps/web/.env.example apps/web/.env.local
+
+# Mobile
+cp apps/mobile/.env.example apps/mobile/.env
 ```
 
-4. **Start development servers**
+Fill in the values — see `.env.example` files for documentation on each variable.
+
+Required services:
+- [Supabase](https://supabase.com) — database, auth, storage
+- [ImageKit](https://imagekit.io) — image CDN (free tier: 20GB/month)
+- [Upstash](https://upstash.com) — Redis for rate limiting (free tier: 10k commands/day)
+
+### 4. Run the development servers
 
 ```bash
-   pnpm dev
+# Run all apps in parallel
+pnpm dev
+
+# Or individually
+pnpm --filter web dev          # http://localhost:3000
+pnpm --filter mobile start     # Expo dev server
 ```
 
-This starts:
-
-- Web app: http://localhost:3000
-- Mobile app: Expo DevTools
-
-## 📝 Available Scripts
+### 5. Check project health
 
 ```bash
-# Development
-pnpm dev          # Start all apps in development mode
-pnpm dev:web      # Start only web app
-pnpm dev:mobile   # Start only mobile app
-
-# Building
-pnpm build        # Build all apps for production
-pnpm build:web    # Build only web app
-pnpm build:mobile # Build only mobile app
-
-# Code Quality
-pnpm lint         # Lint all packages
-pnpm type-check   # Type check all packages
-pnpm format       # Format code with Prettier
-
-# Cleanup
-pnpm clean        # Remove all build artifacts and caches
+pnpm status   # custom health check script
 ```
-
-## 📂 Project Structure
-
-```
-apps/web/
-├── app/              # Next.js App Router pages
-├── components/       # React components
-├── lib/              # Utilities (Supabase, R2, ImageKit clients)
-└── types/            # TypeScript type definitions
-
-apps/mobile/
-├── screens/          # Mobile screens
-├── components/       # React Native components
-├── navigation/       # Navigation configuration
-└── lib/              # Mobile utilities
-
-packages/shared/
-├── types/            # Shared TypeScript types
-├── validation/       # Zod schemas
-└── constants/        # API constants and configurations
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Development Workflow
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Commit with conventional commits (`git commit -m 'feat: add amazing feature'`)
-5. Push to your fork (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
-
-## 📋 Roadmap
-
-- [x] Phase 1: Monorepo setup
-- [ ] Phase 2: Web app foundation
-- [ ] Phase 3: Mobile app foundation
-- [ ] Phase 4: Shared package & types
-- [ ] Phase 5: Integration & verification
-- [ ] Phase 6: Authentication implementation
-- [ ] Phase 7: Event management features
-- [ ] Phase 8: Photo upload & storage
-- [ ] Phase 9: Guest session handling
-- [ ] Phase 10: Personal vault feature
-- [ ] Phase 11: Auto-cleanup cron jobs
-- [ ] Phase 12: Production deployment
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👥 Authors
-
-- **Suharshit** - [GitHub](https://github.com/Suharshit)
-
-## 🙏 Acknowledgments
-
-- Built with [Turborepo](https://turbo.build/)
-- Styled with [Tailwind CSS](https://tailwindcss.com/)
-- Database by [Supabase](https://supabase.com/)
-- Image delivery by [ImageKit](https://imagekit.io/)
 
 ---
 
-<p align="center">Made with ❤️ for seamless event photo sharing</p>
+## 🗄️ Database Schema
+
+The Supabase PostgreSQL schema consists of 7 core tables:
+
+```
+users               — auth profile (name, email, avatar, bio)
+events              — event metadata (title, dates, invite_token, cover_image)
+event_members       — user ↔ event membership with role (host/contributor/viewer)
+photos              — photo metadata (storage_key, status, uploader references)
+personal_vault      — user ↔ photo many-to-many for saved photos
+guest_sessions      — session tokens for accountless guest uploads
+```
+
+Row Level Security (RLS) is enabled on all tables. Key policies:
+- Users can only read events they're members of
+- Only hosts can edit or delete events
+- Photos are only visible to event members
+- Guest sessions are managed via service role only
+
+---
+
+## 📤 Upload Architecture
+
+Vibely uses a **two-step signed URL upload flow** to avoid routing file bytes through the Next.js server:
+
+```
+Client                    API (Next.js)          Supabase Storage
+  │                           │                        │
+  ├── POST /api/photos/upload ─→                       │
+  │      (filename, type, size)                        │
+  │                    ←── signed URL + photo_id       │
+  │                                                    │
+  ├───────────── PUT signed URL ──────────────────────→│
+  │                  (raw file bytes)           stores file
+  │
+  ├── POST /api/photos/:id/complete ─→
+  │                    verifies file exists in storage
+  │                    status: 'uploading' → 'active'
+  │←─────────────── activated photo ──────────────────
+```
+
+Benefits: no server body size limits, native upload progress tracking, lower latency.
+
+---
+
+## ⚙️ Automated Cleanup
+
+Four `pg_cron` jobs run on schedule inside Postgres:
+
+| Job | Schedule | What it does |
+|---|---|---|
+| `expire-events` | Daily 00:05 UTC | Marks events as `expired` when `expires_at` passes |
+| `soft-delete-expired-photos` | Daily 00:15 UTC | Marks un-saved photos as `deleted` after event expiry |
+| `cleanup-abandoned-uploads` | Hourly :30 | Removes `uploading` rows older than 2 hours |
+| `cleanup-old-guest-sessions` | Daily 01:00 UTC | Removes guest sessions older than 90 days |
+
+A Supabase Edge Function runs daily at 02:00 UTC to **hard-delete** storage files for photos soft-deleted 7+ days ago.
+
+---
+
+## 🔒 Rate Limiting
+
+Implemented via Upstash Redis with a sliding window counter:
+
+| Endpoint | Limit |
+|---|---|
+| `POST /api/photos/upload` | 20 uploads / user / hour |
+| `POST /api/guest/session` | 5 sessions / IP / 15 min |
+| `POST /api/events/:id/join` | 10 attempts / IP / minute |
+| Auth endpoints | 10 attempts / IP / 15 min |
+
+Rate limiting degrades gracefully — if Upstash is unavailable, requests are allowed through.
+
+---
+
+## 📱 Mobile
+
+The Expo app supports all MVP features with platform-native implementations:
+
+- `expo-image-picker` + `expo-image-manipulator` for photo selection and compression (images compressed to max 2400px / 82% JPEG before upload)
+- `expo-file-system` `uploadAsync` for upload progress tracking (React Native `fetch` doesn't support upload progress)
+- `expo-media-library` for saving photos to camera roll
+- `AsyncStorage` for guest session persistence
+- Bottom tab navigation: Events / Vault / Profile
+- Action sheets (iOS) and Alert dialogs (Android) for destructive actions
+
+**EAS Build profiles:**
+
+```bash
+eas build --profile preview     # internal testing
+eas build --profile production  # App Store / Play Store
+```
+
+---
+
+## 🌐 Deployment
+
+### Web (Vercel)
+
+```bash
+# Connect repo to Vercel, set root directory to apps/web
+# Add all environment variables from apps/web/.env.example
+vercel --prod
+```
+
+Verify deployment: `https://yourdomain.vercel.app/health`
+
+### Mobile (EAS)
+
+```bash
+cd apps/mobile
+eas init                    # initialize EAS project
+eas build --platform all --profile production
+eas submit --platform all   # submit to stores
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome. Please read the [contributing guidelines](.github/CONTRIBUTING.md) and open an issue before submitting a PR for large changes.
+
+```bash
+# Development workflow
+git checkout -b feat/your-feature
+pnpm lint
+pnpm typecheck
+pnpm test
+git push origin feat/your-feature
+# Open a PR against develop
+```
+
+---
+
+## 📄 License
+
+MIT — see [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+  <sub>Built by <a href="https://github.com/Suharshit">Suharshit</a> · Powered by Supabase, ImageKit, and Vercel</sub>
+</div>
