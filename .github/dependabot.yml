@@ -1,4 +1,0 @@
-version: 2
-updates: []
-  # All version updates are disabled to prevent unwanted PRs
-  # that trigger unnecessary deployments.
