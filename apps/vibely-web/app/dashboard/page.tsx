@@ -49,27 +49,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Top nav */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-gray-900">Vibely</h1>
-          <nav className="flex items-center gap-4">
-            <Link
-              href="/vault"
-              className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
-            >
-              Vault
-            </Link>
-            <Link
-              href="/profile"
-              className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
-            >
-              Profile
-            </Link>
-          </nav>
-        </div>
-      </header>
-
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         {/* Page header */}
         <div className="flex items-center justify-between mb-8">
