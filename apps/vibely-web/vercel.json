@@ -1,8 +1,8 @@
 {
   "framework": "nextjs",
-  "buildCommand": "cd ../.. && pnpm turbo run build --filter=web",
+  "buildCommand": "cd ../.. && pnpm turbo run build --filter=vibely-web",
   "installCommand": "pnpm install",
-  "outputDirectory": "apps/web/.next",
+  "outputDirectory": ".next",
   "regions": ["bom1"],
   "headers": [
     {
