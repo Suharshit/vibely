@@ -55,4 +55,29 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Neumorphic Utilities */
+  .bg-neumorphic {
+    @apply bg-[#e6e9ef]; /* Match the light gray background typical in standard neomorphism */
+  }
+
+  .shadow-neumorphic {
+    box-shadow: 12px 12px 24px #c4c6cb, -12px -12px 24px #ffffff;
+  }
+
+  .shadow-neumorphic-sm {
+    box-shadow: 6px 6px 12px #c4c6cb, -6px -6px 12px #ffffff;
+  }
+
+  .shadow-neumorphic-inner {
+    box-shadow: inset 6px 6px 12px #c4c6cb, inset -6px -6px 12px #ffffff;
+  }
+
+  /* Specific purple accent buttons using neumorphism */
+  .bg-neumorphic-purple {
+    @apply bg-violet-600;
+  }
+  .shadow-neumorphic-purple {
+    box-shadow: 6px 6px 12px #6b21a8, -6px -6px 12px #a855f7;
+  }
 }

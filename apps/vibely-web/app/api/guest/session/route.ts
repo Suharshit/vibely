@@ -81,7 +81,11 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    console.error("[guest-session] Failed to insert:", error.message, error.details);
+    console.error(
+      "[guest-session] Failed to insert:",
+      error.message,
+      error.details
+    );
     return NextResponse.json(
       { error: "Failed to create guest session" },
       { status: 500 }

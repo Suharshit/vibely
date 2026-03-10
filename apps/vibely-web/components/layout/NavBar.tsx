@@ -13,6 +13,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
+import { MirrorRectangular } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/dashboard", label: "Events", emoji: "📅" },
@@ -53,10 +54,13 @@ export function NavBar() {
 
   // Hide nav on guest and auth pages
   if (
+    pathname === "/" ||
     pathname.startsWith("/guest") ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/signup") ||
-    pathname.startsWith("/join")
+    pathname.startsWith("/join") ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/pricing")
   )
     return null;
 
@@ -69,7 +73,9 @@ export function NavBar() {
             href="/dashboard"
             className="flex items-center gap-2 font-bold text-gray-900 hover:text-violet-600 transition-colors"
           >
-            <span className="text-lg">📸</span>
+            <span className="text-lg">
+              <MirrorRectangular />
+            </span>
             <span className="text-base">Vibely</span>
           </Link>
 

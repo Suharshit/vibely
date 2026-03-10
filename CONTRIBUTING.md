@@ -54,6 +54,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `test`: Adding or updating tests
 - `chore`: Maintenance tasks
 - `ci`: CI/CD changes
+- `ui`: UI changes
 
 ### Examples
 
