@@ -45,6 +45,7 @@
   * {
     border-color: hsl(var(--border));
   }
+
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
@@ -57,8 +58,33 @@
   }
 
   /* Neumorphic Utilities */
+  .bg-background-light {
+    @apply bg-[#E8EDF2];
+  }
+
+  .bg-background-dark {
+    @apply bg-[#171121];
+  }
+
+  .shadow-neo-flat {
+    box-shadow: 8px 8px 16px #c5cad0, -8px -8px 16px #ffffff;
+  }
+
+  .shadow-neo-inset {
+    box-shadow: inset 4px 4px 8px #c5cad0, inset -4px -4px 8px #ffffff;
+  }
+
+  .shadow-neo-button {
+    box-shadow: 4px 4px 10px rgba(124, 59, 237, 0.3), -2px -2px 6px rgba(255, 255, 255, 0.2);
+  }
+
+  .neo-card {
+    box-shadow: 20px 20px 60px #c5cad0, -20px -20px 60px #ffffff;
+  }
+
   .bg-neumorphic {
-    @apply bg-[#e6e9ef]; /* Match the light gray background typical in standard neomorphism */
+    @apply bg-[#e6e9ef];
+    /* Maintains compatibility with landing page */
   }
 
   .shadow-neumorphic {
@@ -77,6 +103,7 @@
   .bg-neumorphic-purple {
     @apply bg-violet-600;
   }
+
   .shadow-neumorphic-purple {
     box-shadow: 6px 6px 12px #6b21a8, -6px -6px 12px #a855f7;
   }

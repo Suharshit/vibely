@@ -3,32 +3,24 @@
 // ============================================================
 // apps/web/app/(auth)/signup/page.tsx
 // ============================================================
-// Key signup flow:
-//  1. User fills form → signUp() called
-//  2. Supabase creates auth.users row
-//  3. handle_new_user() DB trigger creates public.users row
-//  4. Supabase sends confirmation email (unless disabled in dev)
-//  5. User clicks confirmation link → redirected to /auth/callback
-//  6. Callback exchanges code → session set → redirect to dashboard
-//
-// During development you should disable email confirmation in
-// Supabase Dashboard → Auth → Providers → Email → "Confirm email"
-// so you can test without checking your inbox every time.
+// Neumorphic Signup page preserving existing Supabase auth flow.
 // ============================================================
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { Zap, Eye, EyeOff } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { signUp, signInWithGoogle, isAuthenticated, isLoading } = useAuth();
+  const { signUp, isAuthenticated, isLoading } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,10 +36,6 @@ export default function SignupPage() {
     setError("");
     setSuccessMessage("");
 
-    // ── Client-side validation ──────────────────────────────
-    // We validate here AND on the server (Zod in API routes).
-    // Client validation gives instant feedback; server validation
-    // is the real security layer you can't bypass.
     if (name.trim().length < 2) {
       setError("Name must be at least 2 characters.");
       return;
@@ -71,90 +59,57 @@ export default function SignupPage() {
       return;
     }
 
-    // Supabase sends a confirmation email by default.
-    // We show a message instead of redirecting.
-    // If email confirmation is disabled in dev, the user is
-    // immediately signed in and onAuthStateChange fires.
     setSuccessMessage(
       "Account created! Check your email for a confirmation link, then come back to sign in."
     );
     setIsSubmitting(false);
   };
 
-  const handleGoogleSignup = async () => {
-    setError("");
-    const result = await signInWithGoogle();
-    if (!result.success) {
-      setError("Failed to start Google sign-up. Please try again.");
-    }
-  };
-
   if (isLoading) return null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Vibely</h1>
-          <p className="mt-2 text-gray-500 text-sm">Create your free account</p>
-        </div>
+    <div className="font-display text-slate-900 bg-background-light min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-[480px]">
+        {/* Neumorphic Card */}
+        <div className="neo-card bg-background-light p-8 sm:p-10 rounded-xl flex flex-col gap-8 border border-white/50 items-center">
+          {/* Logo/Icon */}
+          <div className="w-16 h-16 bg-violet-600/10 rounded-2xl flex items-center justify-center shadow-neo-flat mb-2">
+            <Zap className="text-violet-600 w-8 h-8" strokeWidth={2.5} />
+          </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          {error && (
-            <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-100 text-sm text-red-700">
-              {error}
-            </div>
-          )}
+          {/* Header Section */}
+          <div className="text-center w-full">
+            <h4 className="text-violet-600 text-sm font-bold uppercase tracking-widest mb-2">
+              Join Vibely
+            </h4>
+            <h2 className="text-slate-800 text-3xl font-black tracking-tight leading-tight">
+              Start capturing memories
+            </h2>
+          </div>
 
-          {successMessage && (
-            <div className="mb-6 p-3 rounded-lg bg-green-50 border border-green-100 text-sm text-green-700">
-              {successMessage}
-            </div>
-          )}
-
-          {!successMessage && (
-            <>
-              <button
-                onClick={handleGoogleSignup}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  />
-                </svg>
-                Continue with Google
-              </button>
-
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-100" />
-                </div>
-                <div className="relative flex justify-center text-xs text-gray-400">
-                  <span className="bg-white px-3">or sign up with email</span>
-                </div>
+          {/* Form Section */}
+          <form onSubmit={handleSignup} className="w-full flex flex-col gap-6">
+            {error && (
+              <div className="p-3 rounded-xl shadow-neo-inset bg-background-light border border-red-200 text-sm text-red-600 text-center font-medium">
+                {error}
               </div>
+            )}
 
-              <form onSubmit={handleSignup} className="space-y-4">
-                <div>
+            {successMessage && (
+              <div className="p-4 rounded-xl shadow-neo-inset bg-background-light border border-green-200 text-sm text-green-700 text-center font-medium leading-relaxed">
+                {successMessage}
+              </div>
+            )}
+
+            {!successMessage && (
+              <>
+                {/* Full Name Input */}
+                <div className="flex flex-col gap-1.5">
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                    className="text-sm font-semibold text-slate-600 px-1"
                   >
-                    Full name
+                    Full Name
                   </label>
                   <input
                     id="name"
@@ -162,18 +117,18 @@ export default function SignupPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    autoComplete="name"
-                    placeholder="Your name"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-transparent transition-all"
+                    className="shadow-neo-inset rounded-xl bg-background-light w-full h-12 px-5 text-slate-800 placeholder:text-slate-400 font-medium border-none outline-none focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all [&:-webkit-autofill]:shadow-[0_0_0px_1000px_#E8EDF2_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:#1e293b]"
+                    placeholder="Enter your full name"
                   />
                 </div>
 
-                <div>
+                {/* Email Input */}
+                <div className="flex flex-col gap-1.5">
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                    className="text-sm font-semibold text-slate-600 px-1"
                   >
-                    Email
+                    Email Address
                   </label>
                   <input
                     id="email"
@@ -181,37 +136,50 @@ export default function SignupPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    autoComplete="email"
-                    placeholder="you@example.com"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-transparent transition-all"
+                    className="shadow-neo-inset rounded-xl bg-background-light w-full h-12 px-5 text-slate-800 placeholder:text-slate-400 font-medium border-none outline-none focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all [&:-webkit-autofill]:shadow-[0_0_0px_1000px_#E8EDF2_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:#1e293b]"
+                    placeholder="email@example.com"
                   />
                 </div>
 
-                <div>
+                {/* Password Input */}
+                <div className="flex flex-col gap-1.5">
                   <label
                     htmlFor="password"
-                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                    className="text-sm font-semibold text-slate-600 px-1"
                   >
                     Password
                   </label>
-                  <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    autoComplete="new-password"
-                    placeholder="Min. 8 characters"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-transparent transition-all"
-                  />
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="shadow-neo-inset rounded-xl bg-background-light w-full h-12 px-5 pr-12 text-slate-800 placeholder:text-slate-400 font-medium tracking-wide border-none outline-none focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all [&:-webkit-autofill]:shadow-[0_0_0px_1000px_#E8EDF2_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:#1e293b]"
+                      placeholder="Create a password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-violet-600 transition-colors focus:outline-none"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
-                <div>
+                {/* Confirm Password Input */}
+                <div className="flex flex-col gap-1.5">
                   <label
                     htmlFor="confirmPassword"
-                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                    className="text-sm font-semibold text-slate-600 px-1"
                   >
-                    Confirm password
+                    Confirm Password
                   </label>
                   <input
                     id="confirmPassword"
@@ -219,45 +187,60 @@ export default function SignupPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
-                    autoComplete="new-password"
+                    className="shadow-neo-inset rounded-xl bg-background-light w-full h-12 px-5 text-slate-800 placeholder:text-slate-400 font-medium tracking-wide border-none outline-none focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all [&:-webkit-autofill]:shadow-[0_0_0px_1000px_#E8EDF2_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:#1e293b]"
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-transparent transition-all"
                   />
                 </div>
 
-                <p className="text-xs text-gray-400">
-                  By creating an account, you agree to our{" "}
-                  <Link href="/terms" className="underline">
-                    Terms
+                {/* Disclaimer */}
+                <p className="text-slate-500 text-xs text-center px-4 leading-relaxed mt-2">
+                  By signing up, you agree to our{" "}
+                  <Link
+                    href="/terms"
+                    className="text-violet-600 font-bold hover:underline"
+                  >
+                    Terms of Service
                   </Link>{" "}
                   and{" "}
-                  <Link href="/privacy" className="underline">
+                  <Link
+                    href="/privacy"
+                    className="text-violet-600 font-bold hover:underline"
+                  >
                     Privacy Policy
                   </Link>
                   .
                 </p>
 
+                {/* Action Button */}
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3 px-4 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                  className="mt-4 w-full h-14 bg-violet-600 text-white font-bold text-lg rounded-xl shadow-neo-button hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-70 focus:outline-none flex items-center justify-center"
                 >
-                  {isSubmitting ? "Creating account…" : "Create account"}
+                  {isSubmitting ? "Creating..." : "Create Account"}
                 </button>
-              </form>
-            </>
-          )}
+              </>
+            )}
+          </form>
+
+          {/* Bottom Link */}
+          <div className="mt-2 text-center">
+            <p className="text-slate-500 text-sm font-medium">
+              Already have an account?{" "}
+              <Link
+                href="/login"
+                className="text-violet-600 font-bold hover:underline ml-1"
+              >
+                Log in
+              </Link>
+            </p>
+          </div>
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className="text-gray-900 font-medium hover:underline"
-          >
-            Sign in
-          </Link>
-        </p>
+        {/* Footer Info */}
+        <div className="mt-10 text-center text-slate-400 text-sm font-medium">
+          © {new Date().getFullYear()} Vibely Inc. All rights reserved.
+        </div>
       </div>
     </div>
   );

@@ -20,7 +20,7 @@ import { StepsSection } from "@/components/landing/StepsSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { BottomCTA } from "@/components/landing/BottomCTA";
 import Link from "next/link";
-import { MirrorRectangular } from "lucide-react";
+import { Zap } from "lucide-react";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -47,7 +47,7 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2 font-semibold text-gray-500">
             <span className="text-lg">
-              <MirrorRectangular />
+              <Zap strokeWidth={2.5} />
             </span>{" "}
             Vibely
           </div>
