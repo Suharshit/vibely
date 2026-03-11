@@ -1,0 +1,38 @@
+# .github/workflows/jules-backend.yml
+
+name: Jules Backend Agent
+
+on:
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: 'Task for Jules'
+        required: true
+      branch:
+        description: 'Base branch (default: develop)'
+        default: 'develop'
+
+jobs:
+  assign-to-jules:
+    runs-on: ubuntu-latest
+    # Only run when the 'jules-backend' label is applied
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'jules-backend'))
+
+    steps:
+      - name: Invoke Jules
+        uses: google-labs-code/jules-invoke@v1
+        with:
+          prompt: |
+            ${{ github.event_name == 'issues' && github.event.issue.body || inputs.prompt }}
+
+            IMPORTANT CONSTRAINTS (always apply):
+            - Base your work on the `develop` branch
+            - Only modify files listed in AGENTS.md under "Backend Scope for Jules"
+            - Never touch apps/mobile/ or any frontend page files
+            - Follow all conventions in AGENTS.md
+          branch: ${{ inputs.branch || 'develop' }}
+          jules_api_key: ${{ secrets.JULES_API_KEY }}
