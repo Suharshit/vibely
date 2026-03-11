@@ -32,4 +32,5 @@ CREATE POLICY select_own_notifications ON public.notifications
 -- Policy: users can only UPDATE their own notifications
 CREATE POLICY update_own_notifications ON public.notifications
   FOR UPDATE
-  USING (auth.uid() = user_id);
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
