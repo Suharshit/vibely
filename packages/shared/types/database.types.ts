@@ -161,6 +161,61 @@ export type Database = {
           },
         ];
       };
+      notifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          type: "photo_uploaded" | "member_joined" | "event_expiring";
+          event_id: string | null;
+          photo_id: string | null;
+          message: string;
+          is_read: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          type: "photo_uploaded" | "member_joined" | "event_expiring";
+          event_id?: string | null;
+          photo_id?: string | null;
+          message: string;
+          is_read?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          type?: "photo_uploaded" | "member_joined" | "event_expiring";
+          event_id?: string | null;
+          photo_id?: string | null;
+          message?: string;
+          is_read?: boolean;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "notifications_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "notifications_photo_id_fkey";
+            columns: ["photo_id"];
+            isOneToOne: false;
+            referencedRelation: "photos";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       personal_vault: {
         Row: {
           id: string;

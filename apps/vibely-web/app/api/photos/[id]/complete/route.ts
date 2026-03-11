@@ -16,6 +16,7 @@
 import { NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { thumbnailUrl, previewUrl } from "@shared/utils/storage";
+import { createNotification } from "@/lib/notify";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -84,6 +85,23 @@ export async function POST(_req: Request, { params }: RouteParams) {
     return NextResponse.json(
       { error: "Failed to activate photo" },
       { status: 500 }
+    );
+  }
+
+  // Look up event host to notify them
+  const { data: eventData } = await adminSupabase
+    .from("events")
+    .select("host_id, title")
+    .eq("id", photo.event_id)
+    .single();
+
+  if (eventData) {
+    await createNotification(
+      eventData.host_id,
+      "photo_uploaded",
+      `A new photo was uploaded to ${eventData.title}.`,
+      photo.event_id,
+      photoId
     );
   }
 
