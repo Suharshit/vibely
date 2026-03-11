@@ -1,3 +1,10 @@
+// ============================================================
+// apps/vibely-web/app/api/notifications/[id]/route.ts
+// ============================================================
+// PATCH /api/notifications/[id]
+// Marks a specific notification as read.
+// ============================================================
+
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 

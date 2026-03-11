@@ -1,3 +1,13 @@
+// ============================================================
+// apps/vibely-web/app/api/notifications/route.ts
+// ============================================================
+// GET /api/notifications
+// Retrieves paginated unread notifications for the current user.
+//
+// PATCH /api/notifications
+// Marks all or specific notifications as read.
+// ============================================================
+
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
