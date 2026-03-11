@@ -10,7 +10,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { MirrorRectangular } from "lucide-react";
+import { Zap } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
 const NAV_LINKS = [
@@ -57,9 +57,7 @@ export function NavBarHome() {
           href="/"
           className="flex items-center gap-2 font-bold text-gray-900 hover:text-violet-600 transition-colors"
         >
-          <span className="text-xl">
-            <MirrorRectangular />
-          </span>
+          <Zap strokeWidth={3} />
           <span className="text-lg tracking-tight">Vibely</span>
         </Link>
 
@@ -70,7 +68,7 @@ export function NavBarHome() {
               key={link.href}
               href={link.href}
               onClick={(e) => handleScrollClick(e, link.href, link.isScroll)}
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-sm font-medium text-gray-600 hover:text-violet-600 transition-colors"
             >
               {link.label}
             </Link>

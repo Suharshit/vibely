@@ -22,7 +22,7 @@ export function HeroSection() {
             <span className="text-violet-600">without the chase.</span>
           </h1>
 
-          <p className="mt-6 text-base sm:text-lg text-gray-500 leading-relaxed max-w-lg mx-auto">
+          <p className="mt-6 text-base sm:text-lg text-gray-500 leading-relaxed max-w-sm mx-auto">
             Hosts create an event. Guests scan a QR. Everyone gets the photos
             instantly.
           </p>
@@ -37,7 +37,7 @@ export function HeroSection() {
             </Link>
             <a
               href="#how-it-works"
-              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-neumorphic text-gray-700 text-base font-semibold rounded-full shadow-neumorphic hover:shadow-neumorphic-sm active:shadow-neumorphic-inner transition-all"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-neumorphic text-gray-700 text-base font-semibold rounded-full shadow-neumorphic hover:shadow-neumorphic-sm hover:text-violet-600 active:shadow-neumorphic-inner transition-all"
             >
               See How It Works
             </a>

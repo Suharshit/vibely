@@ -70,3 +70,6 @@ coverage/
 *.tmp
 *.temp
 .cache/
+
+#personal
+jules-tasks.md
