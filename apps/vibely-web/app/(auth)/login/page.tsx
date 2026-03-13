@@ -10,15 +10,7 @@ import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import {
-  Zap,
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  ArrowRight,
-  Terminal,
-} from "lucide-react";
+import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();

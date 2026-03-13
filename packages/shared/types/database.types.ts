@@ -213,7 +213,7 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "photos";
             referencedColumns: ["id"];
-          }
+          },
         ];
       };
       personal_vault: {

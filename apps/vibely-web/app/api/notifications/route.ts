@@ -12,16 +12,20 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 
-const markReadSchema = z.object({
-  all: z.boolean().optional(),
-  ids: z.array(z.string().uuid()).optional()
-}).refine(data => data.all || (data.ids && data.ids.length > 0), {
-  message: "Must provide either 'all: true' or a non-empty array of 'ids'"
-});
+const markReadSchema = z
+  .object({
+    all: z.boolean().optional(),
+    ids: z.array(z.string().uuid()).optional(),
+  })
+  .refine((data) => data.all || (data.ids && data.ids.length > 0), {
+    message: "Must provide either 'all: true' or a non-empty array of 'ids'",
+  });
 
 export async function GET() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -37,7 +41,10 @@ export async function GET() {
     .limit(20);
 
   if (fetchError) {
-    return NextResponse.json({ error: "Failed to fetch notifications" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch notifications" },
+      { status: 500 }
+    );
   }
 
   // Get unread count
@@ -48,18 +55,23 @@ export async function GET() {
     .eq("is_read", false);
 
   if (countError) {
-    return NextResponse.json({ error: "Failed to fetch notification count" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch notification count" },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({
     notifications: notifications || [],
-    unread_count: count || 0
+    unread_count: count || 0,
   });
 }
 
 export async function PATCH(req: Request) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -70,7 +82,10 @@ export async function PATCH(req: Request) {
     const result = markReadSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid request body" },
+        { status: 400 }
+      );
     }
 
     const { all, ids } = result.data;
@@ -87,7 +102,10 @@ export async function PATCH(req: Request) {
     const { error: updateError } = await updateQuery;
 
     if (updateError) {
-      return NextResponse.json({ error: "Failed to update notifications" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to update notifications" },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ success: true });

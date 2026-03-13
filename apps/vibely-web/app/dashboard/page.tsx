@@ -1,173 +1,128 @@
 "use client";
 
-// ============================================================
-// apps/web/app/dashboard/page.tsx
-// ============================================================
-// Main dashboard: shows all events the user belongs to,
-// separated into "upcoming" and "past" sections.
-// Has a prominent "Create event" CTA.
-//
-// WHY 'use client' here?
-// The useEvents hook uses useState/useEffect — Client Component
-// territory. For a larger app, you'd fetch the initial events
-// list in a Server Component and pass it as props to avoid the
-// loading flicker. We keep it simple here for the MVP.
-// ============================================================
-
-import { useState } from "react";
-import Link from "next/link";
+import { useState, useEffect } from "react";
 import { useEvents } from "@/hooks/useEvents";
-import { EventCard } from "@/components/events/EventCard";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
+import { createClient } from "@/lib/supabase/client";
+
+// New Components
+import OverviewHeader from "@/components/dashboard/OverviewHeader";
+import KPIGroup from "@/components/dashboard/KPIGroup";
+import EventGrid from "@/components/events/EventGrid";
+import CreateEventCard from "@/components/events/CreateEventCard";
+import EventCard from "@/components/events/EventCard";
 import { isEventExpired } from "@shared/utils/invite";
 
 export default function DashboardPage() {
-  const { events, isLoading, error, deleteEvent } = useEvents();
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const { events, isLoading: eventsLoading, error: eventsError } = useEvents();
+  const {
+    totalPhotos,
+    formattedSize,
+    isLoading: statsLoading,
+  } = useDashboardStats();
+  const [userName, setUserName] = useState("User");
 
-  const handleDelete = async (id: string) => {
-    const event = events.find((e) => e.id === id);
-    if (!event) return;
-
-    // Simple browser confirm — Phase 14 (polish) will replace with a modal
-    const confirmed = window.confirm(
-      `Delete "${event.title}"? This will permanently delete all photos. This cannot be undone.`
-    );
-    if (!confirmed) return;
-
-    setDeletingId(id);
-    await deleteEvent(id);
-    setDeletingId(null);
-  };
-
-  // Split events into upcoming (active) and past (expired/archived)
-  const upcoming = events.filter(
-    (e) => !isEventExpired(e.expires_at) && e.status === "active"
-  );
-  const past = events.filter(
-    (e) => isEventExpired(e.expires_at) || e.status !== "active"
-  );
+  // Fetch user for the greeting
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase
+        .from("users")
+        .select("name")
+        .eq("id", user.id)
+        .single()
+        .then(({ data }) => {
+          if (data && data.name) {
+            // Pick first name
+            setUserName(data.name.split(" ")[0]);
+          }
+        });
+    });
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-        {/* Page header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Your Events</h2>
-            <p className="mt-1 text-sm text-gray-500">
-              {events.length === 0
-                ? "No events yet"
-                : `${events.length} event${events.length !== 1 ? "s" : ""}`}
-            </p>
+    <div className="w-full h-full flex flex-col gap-10 pb-16">
+      {/* Top Section: Greeting & KPIs */}
+      <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-4">
+        <OverviewHeader userName={userName} />
+        {statsLoading || eventsLoading ? (
+          <div className="flex gap-4 animate-pulse">
+            <div className="h-10 w-28 bg-gray-200 rounded-full"></div>
+            <div className="h-10 w-28 bg-gray-200 rounded-full"></div>
+            <div className="h-10 w-28 bg-gray-200 rounded-full"></div>
           </div>
+        ) : (
+          <KPIGroup
+            totalEvents={events.length}
+            totalPhotos={totalPhotos}
+            formattedSize={formattedSize}
+          />
+        )}
+      </section>
 
-          <Link
-            href="/events/create"
-            className="flex items-center gap-2 bg-violet-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-violet-700 transition-colors"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            Create event
-          </Link>
-        </div>
-
-        {/* Error */}
-        {error && (
+      {/* Main Grid Section */}
+      <section className="w-full">
+        {eventsError && (
           <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-sm text-red-700 mb-6">
-            {error}
+            {eventsError}
           </div>
         )}
 
-        {/* Loading skeleton */}
-        {isLoading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => (
+        <EventGrid>
+          {/* Always show the Create card first */}
+          <CreateEventCard />
+
+          {/* Skeleton Loaders */}
+          {eventsLoading &&
+            Array.from({ length: 3 }).map((_, i) => (
               <div
-                key={i}
-                className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse"
-              >
-                <div className="h-32 bg-gray-100" />
-                <div className="p-4 space-y-3">
-                  <div className="h-4 bg-gray-100 rounded w-3/4" />
-                  <div className="h-3 bg-gray-100 rounded w-1/2" />
-                </div>
-              </div>
+                key={`skeleton-${i}`}
+                className="w-full aspect-[1/2] sm:aspect-auto sm:h-[480px] rounded-[32px] bg-gray-200 animate-pulse"
+              />
             ))}
-          </div>
-        )}
 
-        {/* Empty state */}
-        {!isLoading && events.length === 0 && (
-          <div className="text-center py-20">
-            <div className="text-5xl mb-4">📷</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              No events yet
-            </h3>
-            <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
-              Create your first event and start collecting photos from everyone
-              there.
-            </p>
-            <Link
-              href="/events/create"
-              className="inline-flex items-center gap-2 bg-violet-600 text-white text-sm font-medium px-5 py-2.5 rounded-xl hover:bg-violet-700 transition-colors"
-            >
-              Create your first event
-            </Link>
-          </div>
-        )}
+          {/* Render real events */}
+          {!eventsLoading &&
+            events.map((event) => {
+              const expired =
+                isEventExpired(event.expires_at) || event.status !== "active";
 
-        {/* Upcoming events */}
-        {!isLoading && upcoming.length > 0 && (
-          <section className="mb-10">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
-              Upcoming
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {upcoming.map((event) => (
-                <div
-                  key={event.id}
-                  className={
-                    deletingId === event.id
-                      ? "opacity-50 pointer-events-none"
-                      : ""
-                  }
-                >
-                  <EventCard event={event} onDelete={handleDelete} />
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+              // Mocking specific design elements that might not be in DB yet
+              // Fallback cover image if none is provided
+              const coverImg =
+                event.cover_image_url ||
+                "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800&auto=format&fit=crop";
+              const formattedDate = new Date(
+                event.created_at
+              ).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              });
 
-        {/* Past events */}
-        {!isLoading && past.length > 0 && (
-          <section>
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
-              Past events
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {past.map((event) => (
+              return (
                 <EventCard
                   key={event.id}
-                  event={event}
-                  onDelete={handleDelete}
+                  id={event.id}
+                  title={event.title}
+                  dateStr={formattedDate}
+                  description={
+                    event.description ||
+                    "Capture every moment, curate every memory with Vibely."
+                  }
+                  imageUrl={coverImg}
+                  status={expired ? "EXPIRED" : "ACTIVE"}
+                  tags={
+                    expired
+                      ? ["Professional", "Archive"]
+                      : ["Outdoor", "Social"]
+                  }
                 />
-              ))}
-            </div>
-          </section>
-        )}
-      </main>
+              );
+            })}
+        </EventGrid>
+      </section>
     </div>
   );
 }

@@ -17,15 +17,13 @@ export async function createNotification(
 ) {
   const adminSupabase = createAdminClient();
 
-  const { error } = await adminSupabase
-    .from("notifications")
-    .insert({
-      user_id: userId,
-      type,
-      message,
-      event_id: eventId || null,
-      photo_id: photoId || null,
-    });
+  const { error } = await adminSupabase.from("notifications").insert({
+    user_id: userId,
+    type,
+    message,
+    event_id: eventId || null,
+    photo_id: photoId || null,
+  });
 
   if (error) {
     console.error("Failed to create notification:", error);

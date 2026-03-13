@@ -5,7 +5,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { NavBar } from "@/components/layout/NavBar";
 import { ToastProvider } from "@/components/layout/Toast";
 import { AuthProvider } from "@/context/AuthContext";
 
@@ -34,8 +33,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <ToastProvider>
-            <NavBar />
-            <main>{children}</main>
+            <main className="bg-[#F0F2f5]">{children}</main>
           </ToastProvider>
         </AuthProvider>
       </body>
