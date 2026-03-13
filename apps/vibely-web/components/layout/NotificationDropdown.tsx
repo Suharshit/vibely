@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { Bell } from "lucide-react";
 import IconButton from "@/components/ui/IconButton";
 import { useNotifications } from "@/hooks/useNotifications";
-import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 
 export default function NotificationDropdown() {
@@ -60,7 +59,7 @@ export default function NotificationDropdown() {
             {unreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
-                className="text-xs text-indigo-600 font-medium hover:text-indigo-800 transition-colors"
+                className="text-xs text-indigo-600 font-medium hover:text-indigo-800 transition-colors cursor-pointer"
               >
                 Mark all as read
               </button>
@@ -82,14 +81,14 @@ export default function NotificationDropdown() {
             ) : (
               <div className="flex flex-col">
                 {notifications.map((notif) => (
-                  <Link
+                  <button
                     key={notif.id}
-                    href={"#"} // TODO: Add link path
+                    type="button"
                     onClick={() => setIsOpen(false)}
-                    className={`p-4 border-b last:border-0 border-gray-50 hover:bg-gray-50 transition-colors flex gap-3 ${!notif.is_read ? "bg-indigo-50/20" : ""}`}
+                    className={`p-3 pt-[3px] border-b last:border-0 border-gray-50 hover:bg-zinc-100 transition-colors flex gap-1 text-left ${!notif.is_read ? "bg-indigo-50/20" : ""}`}
                   >
                     {!notif.is_read && (
-                      <div className="mt-1.5 w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0" />
+                      <div className="mt-1 w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0" />
                     )}
                     <div className="flex flex-col gap-1 w-full">
                       <p className="text-sm text-gray-800 font-medium leading-tight">
@@ -101,7 +100,7 @@ export default function NotificationDropdown() {
                         })}
                       </span>
                     </div>
-                  </Link>
+                  </button>
                 ))}
               </div>
             )}

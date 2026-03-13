@@ -91,15 +91,16 @@ export default function DashboardPage() {
               // Mocking specific design elements that might not be in DB yet
               // Fallback cover image if none is provided
               const coverImg =
-                event.cover_image_url ||
-                "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800&auto=format&fit=crop";
-              const formattedDate = new Date(
-                event.created_at
-              ).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              });
+                event.cover_image_url || "/images/event-fallback.jpg";
+              const eventDate = event.event_date || event.created_at;
+              const formattedDate = new Date(eventDate).toLocaleDateString(
+                "en-US",
+                {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                }
+              );
 
               return (
                 <EventCard

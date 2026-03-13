@@ -42,9 +42,13 @@ export async function GET() {
       .in("event_id", eventIds)
       .eq("status", "active");
 
-    if (!photosError && photosCount !== null) {
-      totalPhotos = photosCount;
+    if (photosError) {
+      return NextResponse.json(
+        { error: "Failed to fetch photo count" },
+        { status: 500 }
+      );
     }
+    totalPhotos = photosCount ?? 0;
   }
 
   // 2. Get total size of all items in personal vault
@@ -54,12 +58,16 @@ export async function GET() {
     .eq("user_id", user.id);
 
   let totalBytes = 0;
-  if (!vaultError && vaultItems) {
-    totalBytes = vaultItems.reduce(
-      (acc, item) => acc + (item.photo?.file_size ?? 0),
-      0
+  if (vaultError) {
+    return NextResponse.json(
+      { error: "Failed to fetch vault items" },
+      { status: 500 }
     );
   }
+  totalBytes = vaultItems.reduce(
+    (acc, item) => acc + (item.photo?.file_size ?? 0),
+    0
+  );
 
   return NextResponse.json({
     totalPhotos,

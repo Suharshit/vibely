@@ -49,14 +49,15 @@ export default function ProfileButton() {
 
   const handleSignOut = async () => {
     const supabase = createClient();
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      return;
+    }
     router.push("/login");
   };
 
   const handleThemeToggle = () => {
-    // Placeholder implementation for theme toggle logic
-    // Add real implementation when global theme context exists
-    console.log("Theme toggled");
+    // TODO: Implement theme toggle logic
   };
 
   return (

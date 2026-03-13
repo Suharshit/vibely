@@ -36,6 +36,7 @@ export default function EventCard({
         src={imageUrl}
         alt={title}
         fill
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         className="object-cover transition-transform duration-700 group-hover:scale-105"
       />
 
@@ -84,13 +85,13 @@ export default function EventCard({
           {/* Action Button */}
           <div className="mt-6 pointer-events-auto">
             {isExpired ? (
-              <button className="w-full py-4 px-6 rounded-full font-bold text-sm bg-[#222222] hover:bg-[#1a1a1a] text-white border border-white/10 transition-colors shadow-lg flex items-center justify-center cursor-pointer">
+              <span className="w-full py-4 px-6 rounded-full font-bold text-sm bg-[#222222] hover:bg-[#1a1a1a] text-white border border-white/10 transition-colors shadow-lg flex items-center justify-center cursor-pointer">
                 View Archive
-              </button>
+              </span>
             ) : (
-              <button className="w-full py-4 px-6 rounded-full font-bold text-sm bg-white hover:bg-gray-50 text-gray-900 border border-transparent hover:border-gray-200 transition-colors shadow-xl flex items-center justify-center gap-2 group-hover:scale-[1.02] cursor-pointer">
+              <span className="w-full py-4 px-6 rounded-full font-bold text-sm bg-white hover:bg-gray-50 text-gray-900 border border-transparent hover:border-gray-200 transition-colors shadow-xl flex items-center justify-center gap-2 group-hover:scale-[1.02] cursor-pointer">
                 View Vault
-              </button>
+              </span>
             )}
           </div>
         </div>

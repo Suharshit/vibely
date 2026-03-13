@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="w-full flex justify-between items-center px-8 py-6 text-sm text-gray-400 mt-auto bg-transparent">
       <div className="flex items-center gap-1">
-        <span>© 2024 Vibely. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} Vibely. All rights reserved.</span>
       </div>
       <div className="flex gap-6">
         <Link href="/privacy" className="hover:text-gray-600 transition-colors">

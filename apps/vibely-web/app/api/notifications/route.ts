@@ -10,7 +10,7 @@
 
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { z } from "zod";
+import { unknown, z } from "zod";
 
 const markReadSchema = z
   .object({
@@ -77,8 +77,15 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  let body = unknown;
+
   try {
-    const body = await req.json();
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+
+  try {
     const result = markReadSchema.safeParse(body);
 
     if (!result.success) {
@@ -110,6 +117,9 @@ export async function PATCH(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Failed to update notifications" },
+      { status: 500 }
+    );
   }
 }

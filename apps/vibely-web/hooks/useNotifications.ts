@@ -35,6 +35,7 @@ export function useNotifications() {
 
   const markAllAsRead = useCallback(async () => {
     try {
+      setError(null);
       const res = await fetch("/api/notifications", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -43,11 +44,15 @@ export function useNotifications() {
 
       if (!res.ok) throw new Error("Failed to mark all as read");
 
-      // Optimistic upate
+      // Optimistic update
       setUnreadCount(0);
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
     } catch (err) {
-      console.error(err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to mark notifications as read"
+      );
     }
   }, []);
 
