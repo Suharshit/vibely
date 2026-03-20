@@ -3,14 +3,13 @@
 // ============================================================
 // apps/web/app/(auth)/login/page.tsx
 // ============================================================
-// Neumorphic Login page preserving existing Supabase auth flow.
+// Glassmorphism Login page preserving existing Supabase auth flow.
 // ============================================================
 
 import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
@@ -21,7 +20,6 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const redirectTo = searchParams.get("redirectTo") ?? "/dashboard";
   const callbackError = searchParams.get("error");
@@ -44,6 +42,12 @@ function LoginForm() {
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!email.trim() || !password.trim()) {
+      setError("Please enter both your email and password.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     const result = await signIn(email, password);
@@ -69,183 +73,207 @@ function LoginForm() {
   if (isLoading) return null;
 
   return (
-    <div className="font-display text-slate-900 bg-background-light min-h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-[480px]">
-        {/* Main Neumorphic Card */}
-        <div className="neo-card bg-background-light p-6 sm:p-8 rounded-xl flex flex-col gap-6 border border-white/50">
-          {/* Header Section */}
-          <div className="flex flex-col gap-1.5 text-center">
-            <div className="flex justify-center mb-3">
-              <div className="w-14 h-14 bg-violet-600 rounded-full flex items-center justify-center shadow-neo-button">
-                <Zap className="text-white w-7 h-7" strokeWidth={2.5} />
-              </div>
+    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-background text-on-surface">
+      {/* Abstract Background Elements */}
+      <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-primary/10 blur-[80px] -z-10"></div>
+      <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full bg-secondary-container/10 blur-[80px] -z-10"></div>
+
+      {/* Top Navigation Bar */}
+      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-transparent backdrop-blur-xl">
+        <Link
+          href="/"
+          className="text-2xl font-bold tracking-tighter text-primary font-headline"
+        >
+          Vibely
+        </Link>
+        <div className="flex items-center gap-4">
+          <span className="material-symbols-outlined text-primary cursor-pointer hover:text-primary-dim transition-colors">
+            help_outline
+          </span>
+        </div>
+      </header>
+
+      <main className="flex-grow flex items-center justify-center w-full px-6 pt-24 pb-12">
+        {/* Centered Neumorphic Login Card */}
+        <div className="glass-card w-full max-w-[440px] p-10 rounded-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] relative overflow-hidden group">
+          {/* Branding & Greeting */}
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-surface-container-high mb-6 shadow-lg border border-outline-variant/10">
+              <span
+                className="material-symbols-outlined text-primary text-3xl"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                auto_awesome
+              </span>
             </div>
-            <h1 className="text-[#130e1b] text-3xl font-black leading-tight tracking-tight">
+            <h1 className="text-3xl font-extrabold text-on-surface tracking-tight font-headline mb-2">
               Welcome Back
             </h1>
-            <p className="text-violet-600/80 text-base font-medium">
-              Log in to your vault
+            <p className="text-on-surface-variant font-body">
+              Enter your details to access your curated gallery.
             </p>
           </div>
 
-          {/* Form Section */}
-          <form onSubmit={handleEmailLogin} className="flex flex-col gap-5">
+          {/* Login Form */}
+          <form onSubmit={handleEmailLogin} className="space-y-6">
             {/* Error banner */}
             {error && (
-              <div className="p-3 rounded-xl shadow-neo-inset bg-background-light border border-red-200 text-sm text-red-600 text-center font-medium">
+              <div className="p-3 rounded-xl bg-error/10 border border-error/20 text-sm text-error text-center font-medium">
                 {error}
               </div>
             )}
 
-            {/* Email Input */}
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="email"
-                className="text-sm font-semibold text-slate-600 px-1"
-              >
+            <div className="space-y-2">
+              <label className="block text-[10px] font-medium tracking-widest text-on-surface-variant uppercase font-label px-1">
                 Email Address
               </label>
-              <div className="shadow-neo-inset rounded-xl bg-background-light px-4 py-0.5 flex items-center border border-white/30 focus-within:ring-2 focus-within:ring-violet-500/20 transition-all">
-                <Mail
-                  className="w-5 h-5 text-slate-400 mr-3 shrink-0"
-                  strokeWidth={2.5}
-                />
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">
+                  alternate_email
+                </span>
                 <input
-                  id="email"
+                  className="w-full h-14 bg-surface-container-lowest border border-transparent rounded-xl pl-12 pr-4 text-on-surface focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.6)] transition-all placeholder:text-outline/40 font-medium"
+                  placeholder="name@domain.com"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-transparent border-none outline-none focus:outline-none focus:ring-0 w-full h-11 text-slate-800 placeholder:text-slate-400 font-medium p-0 shadow-none [&:-webkit-autofill]:shadow-[0_0_0px_1000px_#E8EDF2_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:#1e293b]"
-                  placeholder="name@example.com"
                 />
               </div>
             </div>
 
-            {/* Password Input */}
-            <div className="flex flex-col gap-1.5">
+            <div className="space-y-2">
               <div className="flex justify-between items-center px-1">
-                <label
-                  htmlFor="password"
-                  className="text-sm font-semibold text-slate-600"
-                >
+                <label className="block text-[10px] font-medium tracking-widest text-on-surface-variant uppercase font-label">
                   Password
                 </label>
                 <Link
+                  className="text-[10px] font-bold tracking-widest text-[#bd9dff] uppercase font-label hover:text-primary-dim transition-colors"
                   href="/forgot-password"
-                  className="text-violet-600 text-xs font-bold hover:underline"
                 >
                   Forgot Password?
                 </Link>
               </div>
-              <div className="shadow-neo-inset rounded-xl bg-background-light px-4 py-0.5 flex items-center border border-white/30 focus-within:ring-2 focus-within:ring-violet-500/20 transition-all">
-                <Lock
-                  className="w-5 h-5 text-slate-400 mr-3 shrink-0"
-                  strokeWidth={2.5}
-                />
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">
+                  lock
+                </span>
                 <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
+                  className="w-full h-14 bg-surface-container-lowest border border-transparent rounded-xl pl-12 pr-4 text-on-surface focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.6)] transition-all placeholder:text-outline/40 font-medium tracking-wider"
+                  placeholder="••••••••"
+                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-transparent border-none outline-none focus:outline-none focus:ring-0 w-full h-11 text-slate-800 placeholder:text-slate-400 font-medium p-0 tracking-wide shadow-none [&:-webkit-autofill]:shadow-[0_0_0px_1000px_#E8EDF2_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:#1e293b]"
-                  placeholder="••••••••"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="text-slate-400 hover:text-violet-600 transition-colors p-2 -mr-2 shrink-0 rounded-full focus:outline-none"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
               </div>
             </div>
 
-            {/* Action Button */}
-            <div className="pt-3">
+            {/* Action Buttons */}
+            <div className="pt-4 space-y-4">
               <button
+                className="w-full h-14 bg-gradient-to-r from-primary to-primary-dim text-on-primary-container font-extrabold rounded-xl shadow-lg shadow-primary/30 hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-70 disabled:hover:scale-100 cursor-pointer"
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-violet-600 text-white font-bold py-3.5 rounded-xl shadow-neo-button hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group disabled:opacity-70 focus:outline-none"
               >
-                <span>{isSubmitting ? "Logging In..." : "Log In"}</span>
-                {!isSubmitting && (
-                  <ArrowRight
-                    className="w-5 h-5 group-hover:translate-x-1 transition-transform"
-                    strokeWidth={2.5}
-                  />
-                )}
+                {isSubmitting ? "Signing In..." : "Sign In"}
+              </button>
+
+              <div className="relative flex items-center py-2">
+                <div className="flex-grow border-t border-outline-variant/10"></div>
+                <span className="flex-shrink mx-4 text-[10px] text-on-surface-variant uppercase tracking-widest font-label">
+                  Or continue with
+                </span>
+                <div className="flex-grow border-t border-outline-variant/10"></div>
+              </div>
+
+              <button
+                disabled={isSubmitting}
+                onClick={handleGoogleLogin}
+                className="w-full h-14 flex items-center justify-center gap-3 bg-surface-container-high hover:bg-surface-bright text-on-surface font-semibold rounded-xl transition-all border border-outline-variant/10 disabled:opacity-70"
+                type="button"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    fill="#4285F4"
+                  ></path>
+                  <path
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    fill="#34A853"
+                  ></path>
+                  <path
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                    fill="#FBBC05"
+                  ></path>
+                  <path
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    fill="#EA4335"
+                  ></path>
+                </svg>
+                Sign in with Google
               </button>
             </div>
           </form>
 
-          {/* Footer Section */}
-          <div className="text-center pt-2">
-            <p className="text-slate-500 text-sm font-medium">
-              Don&apos;t have an account?{" "}
+          {/* Card Footer */}
+          <div className="mt-10 text-center">
+            <p className="text-on-surface-variant text-sm font-body">
+              New to Vibely?{" "}
               <Link
+                className="text-[#bd9dff] font-semibold hover:text-[#b28cff] transition-colors"
                 href="/signup"
-                className="text-violet-600 font-bold hover:underline"
               >
-                Sign up
+                Create an account
               </Link>
             </p>
           </div>
         </div>
+      </main>
 
-        {/* Social Login Hint */}
-        <div className="mt-8 flex flex-col items-center gap-5">
-          <div className="flex items-center gap-4 w-full">
-            <div className="h-[2px] bg-slate-300 shadow-sm flex-1 rounded-full"></div>
-            <span className="text-slate-400 text-xs font-bold uppercase tracking-widest">
-              Or connect with
-            </span>
-            <div className="h-[2px] bg-slate-300 shadow-sm flex-1 rounded-full"></div>
-          </div>
-
-          <div className="flex justify-center flex-1">
-            <button
-              onClick={handleGoogleLogin}
-              type="button"
-              className="w-14 h-14 rounded-full shadow-neo-flat bg-background-light flex items-center justify-center border border-white/40 active:shadow-neo-inset focus:outline-none transition-all group"
-            >
-              <svg
-                className="w-6 h-6 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
-              </svg>
-            </button>
-          </div>
+      {/* Footer */}
+      <footer className="w-full py-8 text-center mt-auto">
+        <div className="flex justify-center gap-8 mb-4">
+          <Link
+            className="text-[10px] text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest font-label"
+            href="#"
+          >
+            Privacy Policy
+          </Link>
+          <Link
+            className="text-[10px] text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest font-label"
+            href="#"
+          >
+            Terms of Service
+          </Link>
+          <Link
+            className="text-[10px] text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest font-label"
+            href="#"
+          >
+            Support
+          </Link>
         </div>
-      </div>
+        <div className="text-[10px] text-outline/40 uppercase tracking-[0.2em] font-label">
+          © 2024 VIBELY CREATIVE SYSTEMS
+        </div>
+      </footer>
+
+      {/* Decorative Image Overlays (Invisible but present for structure as per mandate) */}
+      <div
+        className="fixed top-20 left-10 w-32 h-32 rounded-3xl opacity-5 rotate-12 -z-10 bg-surface-container"
+        data-alt="Abstract dark geometric shape gradient"
+      ></div>
+      <div
+        className="fixed bottom-40 right-10 w-48 h-48 rounded-3xl opacity-5 -rotate-12 -z-10 bg-surface-container-high"
+        data-alt="Soft blurry violet light orb"
+      ></div>
     </div>
   );
 }
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background-light" />}>
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
       <LoginForm />
     </Suspense>
   );

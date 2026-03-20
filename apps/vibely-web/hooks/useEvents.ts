@@ -17,6 +17,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { Tables } from "@repo/supabase/types";
+import { cachedFetch, invalidateCache, getCached } from "@/lib/fetchCache";
 
 // The event row augmented with the current user's role
 export type EventWithRole = Tables<"events"> & {
@@ -67,9 +68,12 @@ interface UpdateEventData {
   status?: "active" | "expired" | "archived";
 }
 
+const EVENTS_CACHE_KEY = "events";
+
 export function useEvents(): UseEventsReturn {
-  const [events, setEvents] = useState<EventWithRole[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const cached = getCached<{ events: EventWithRole[] }>(EVENTS_CACHE_KEY);
+  const [events, setEvents] = useState<EventWithRole[]>(cached?.events ?? []);
+  const [isLoading, setIsLoading] = useState(!cached);
   const [error, setError] = useState<string | null>(null);
 
   const fetchEvents = useCallback(async () => {
@@ -77,12 +81,14 @@ export function useEvents(): UseEventsReturn {
     setError(null);
 
     try {
-      const res = await fetch("/api/events");
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Failed to fetch events");
-      }
-      const data = await res.json();
+      const data = await cachedFetch(EVENTS_CACHE_KEY, async () => {
+        const res = await fetch("/api/events");
+        if (!res.ok) {
+          const d = await res.json();
+          throw new Error(d.error ?? "Failed to fetch events");
+        }
+        return res.json();
+      });
       setEvents(data.events ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -116,6 +122,7 @@ export function useEvents(): UseEventsReturn {
         }
 
         // Optimistically prepend to local state, then refetch for accuracy
+        invalidateCache(EVENTS_CACHE_KEY);
         await fetchEvents();
         return { success: true, event: json.event };
       } catch {
@@ -145,6 +152,7 @@ export function useEvents(): UseEventsReturn {
       }
 
       // Update in local state without full refetch for responsiveness
+      invalidateCache(EVENTS_CACHE_KEY);
       setEvents((prev) =>
         prev.map((e) => (e.id === id ? { ...e, ...json.event } : e))
       );
@@ -169,6 +177,7 @@ export function useEvents(): UseEventsReturn {
       }
 
       // Remove immediately from local state
+      invalidateCache(EVENTS_CACHE_KEY);
       setEvents((prev) => prev.filter((e) => e.id !== id));
       return { success: true };
     } catch {
@@ -190,9 +199,14 @@ export function useEvents(): UseEventsReturn {
 // ── Single Event Hook ─────────────────────────────────────────
 
 export function useEvent(id: string) {
-  const [event, setEvent] = useState<EventDetail | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const cacheKey = `event:${id}`;
+  const cached = getCached<{ event: EventDetail; user_role: string }>(cacheKey);
+
+  const [event, setEvent] = useState<EventDetail | null>(cached?.event ?? null);
+  const [userRole, setUserRole] = useState<string | null>(
+    cached?.user_role ?? null
+  );
+  const [isLoading, setIsLoading] = useState(!cached);
   const [error, setError] = useState<string | null>(null);
 
   const fetchEvent = useCallback(async () => {
@@ -201,12 +215,14 @@ export function useEvent(id: string) {
     setError(null);
 
     try {
-      const res = await fetch(`/api/events/${id}`);
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Event not found");
-      }
-      const data = await res.json();
+      const data = await cachedFetch(cacheKey, async () => {
+        const res = await fetch(`/api/events/${id}`);
+        if (!res.ok) {
+          const json = await res.json();
+          throw new Error(json.error ?? "Event not found");
+        }
+        return res.json();
+      });
       setEvent(data.event);
       setUserRole(data.user_role);
     } catch (err) {
@@ -214,11 +230,41 @@ export function useEvent(id: string) {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, cacheKey]);
 
   useEffect(() => {
     fetchEvent();
   }, [fetchEvent]);
+
+  const updateEvent = useCallback(
+    async (data: Partial<Tables<"events">>) => {
+      try {
+        const res = await fetch(`/api/events/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const json = await res.json();
+        if (!res.ok) return { success: false, error: json.error };
+        await fetchEvent();
+        return { success: true };
+      } catch {
+        return { success: false, error: "Network error" };
+      }
+    },
+    [id, fetchEvent]
+  );
+
+  const deleteEvent = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/events/${id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (!res.ok) return { success: false, error: json.error };
+      return { success: true };
+    } catch {
+      return { success: false, error: "Network error" };
+    }
+  }, [id]);
 
   const joinEvent = useCallback(
     async (token: string) => {
@@ -239,5 +285,14 @@ export function useEvent(id: string) {
     [id, fetchEvent]
   );
 
-  return { event, userRole, isLoading, error, refetch: fetchEvent, joinEvent };
+  return {
+    event,
+    userRole,
+    isLoading,
+    error,
+    refetch: fetchEvent,
+    joinEvent,
+    updateEvent,
+    deleteEvent,
+  };
 }

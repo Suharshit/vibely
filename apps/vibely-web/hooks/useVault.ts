@@ -3,6 +3,7 @@
 // ============================================================
 
 import { useState, useEffect, useCallback } from "react";
+import { cachedFetch, invalidateCache, getCached } from "@/lib/fetchCache";
 
 export interface VaultPhoto {
   vault_entry_id: string;
@@ -36,20 +37,30 @@ interface UseVaultReturn {
   unsave: (photoId: string) => Promise<void>;
 }
 
+const VAULT_CACHE_KEY = "vault";
+
 export function useVault(): UseVaultReturn {
-  const [photos, setPhotos] = useState<VaultPhoto[]>([]);
-  const [groups, setGroups] = useState<VaultGroup[]>([]);
-  const [total, setTotal] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  // Pre-populate from cache for instant render
+  const cached = getCached<{
+    photos: VaultPhoto[];
+    groups: VaultGroup[];
+    total: number;
+  }>(VAULT_CACHE_KEY);
+  const [photos, setPhotos] = useState<VaultPhoto[]>(cached?.photos ?? []);
+  const [groups, setGroups] = useState<VaultGroup[]>(cached?.groups ?? []);
+  const [total, setTotal] = useState(cached?.total ?? 0);
+  const [isLoading, setIsLoading] = useState(!cached);
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/vault");
-      if (!res.ok) throw new Error("Failed to load vault");
-      const data = await res.json();
+      const data = await cachedFetch(VAULT_CACHE_KEY, async () => {
+        const res = await fetch("/api/vault");
+        if (!res.ok) throw new Error("Failed to load vault");
+        return res.json();
+      });
       setPhotos(data.photos ?? []);
       setGroups(data.groups ?? []);
       setTotal(data.total ?? 0);
@@ -66,6 +77,7 @@ export function useVault(): UseVaultReturn {
 
   const unsave = useCallback(async (photoId: string) => {
     await fetch(`/api/photos/${photoId}/save`, { method: "DELETE" });
+    invalidateCache(VAULT_CACHE_KEY);
     setPhotos((prev) => prev.filter((e) => e.photo.id !== photoId));
     setGroups((prev) =>
       prev

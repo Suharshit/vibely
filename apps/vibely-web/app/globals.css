@@ -1,110 +1,116 @@
 @import "tailwindcss";
 
+@theme {
+  --color-inverse-surface: #fbf8ff;
+  --color-on-tertiary: #6a0a31;
+  --color-on-background: #f8f5fd;
+  --color-primary-dim: #8a4cfc;
+  --color-secondary-container: #612b8f;
+  --color-on-primary-fixed: #000000;
+  --color-surface-variant: #25252c;
+  --color-primary-fixed: #b28cff;
+  --color-error-dim: #d73357;
+  --color-surface-dim: #0e0e13;
+  --color-outline: #76747b;
+  --color-surface: #0e0e13;
+  --color-tertiary-container: #fe81a4;
+  --color-on-tertiary-container: #5a0027;
+  --color-error-container: #a70138;
+  --color-on-secondary-container: #e5c4ff;
+  --color-surface-bright: #2b2b33;
+  --color-primary: #bd9dff;
+  --color-tertiary-fixed: #ff8eac;
+  --color-on-surface-variant: #acaab1;
+  --color-secondary-dim: #be86ef;
+  --color-surface-container-lowest: #000000;
+  --color-on-primary-container: #2e006c;
+  --color-on-tertiary-fixed-variant: #711036;
+  --color-primary-fixed-dim: #a67aff;
+  --color-on-secondary: #3b0065;
+  --color-on-surface: #f8f5fd;
+  --color-background: #0e0e13;
+  --color-tertiary: #ff97b2;
+  --color-secondary-fixed: #e6c5ff;
+  --color-inverse-primary: #742fe5;
+  --color-on-secondary-fixed-variant: #6b369a;
+  --color-secondary: #c38bf5;
+  --color-error: #ff6e84;
+  --color-surface-container: #19191f;
+  --color-inverse-on-surface: #55545a;
+  --color-secondary-fixed-dim: #ddb3ff;
+  --color-surface-container-highest: #25252c;
+  --color-surface-tint: #bd9dff;
+  --color-on-secondary-fixed: #4d137b;
+  --color-on-primary-fixed-variant: #390083;
+  --color-on-error-container: #ffb2b9;
+  --color-on-error: #490013;
+  --color-primary-container: #b28cff;
+  --color-surface-container-low: #131318;
+  --color-surface-container-high: #1f1f26;
+  --color-on-tertiary-fixed: #380016;
+  --color-outline-variant: #48474d;
+  --color-tertiary-fixed-dim: #f77c9e;
+  --color-on-primary: #3c0089;
+  --color-tertiary-dim: #f17799;
+
+  --font-headline: var(--font-jakarta), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
+  --font-label: var(--font-inter), sans-serif;
+
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1.5rem;
+}
+
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --primary: 199 89% 48%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 199 89% 48%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --primary: 199 89% 48%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 199 89% 48%;
-  }
-
-  * {
-    border-color: hsl(var(--border));
-  }
-
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    background-color: #0e0e13;
+    color: #f8f5fd;
+    font-family: var(--font-jakarta), var(--font-inter), sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: rgba(189, 157, 255, 0.3);
   }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .glass-card {
+    background: rgba(25, 25, 31, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(189, 157, 255, 0.05);
+  }
+  .hero-gradient {
+    background: radial-gradient(circle at 50% -20%, rgba(189, 157, 255, 0.15) 0%, rgba(14, 14, 19, 0) 60%);
   }
 
-  /* Neumorphic Utilities */
-  .bg-background-light {
-    @apply bg-[#E8EDF2];
-  }
-
-  .bg-background-dark {
-    @apply bg-[#171121];
-  }
-
-  .shadow-neo-flat {
-    box-shadow: 8px 8px 16px #c5cad0, -8px -8px 16px #ffffff;
-  }
-
-  .shadow-neo-inset {
-    box-shadow: inset 4px 4px 8px #c5cad0, inset -4px -4px 8px #ffffff;
-  }
-
-  .shadow-neo-button {
-    box-shadow: 4px 4px 10px rgba(124, 59, 237, 0.3), -2px -2px 6px rgba(255, 255, 255, 0.2);
-  }
-
-  .neo-card {
-    box-shadow: 20px 20px 60px #c5cad0, -20px -20px 60px #ffffff;
-  }
-
+  /* Some of the legacy neumorphic classes kept for compatibility elsewhere */
   .bg-neumorphic {
-    @apply bg-[#e6e9ef];
-    /* Maintains compatibility with landing page */
+    background-color: var(--color-surface-container);
   }
 
-  .shadow-neumorphic {
-    box-shadow: 12px 12px 24px #c4c6cb, -12px -12px 24px #ffffff;
+  /* Soft Neumorphic utilities for Event Details page */
+  .soft-neumorph-inset {
+    background: #16161D;
+    box-shadow: inset 4px 4px 8px #0a0a0d, 
+                inset -4px -4px 8px #22222d;
   }
-
-  .shadow-neumorphic-sm {
-    box-shadow: 6px 6px 12px #c4c6cb, -6px -6px 12px #ffffff;
-  }
-
-  .shadow-neumorphic-inner {
-    box-shadow: inset 6px 6px 12px #c4c6cb, inset -6px -6px 12px #ffffff;
-  }
-
-  /* Specific purple accent buttons using neumorphism */
-  .bg-neumorphic-purple {
-    @apply bg-violet-600;
-  }
-
-  .shadow-neumorphic-purple {
-    box-shadow: 6px 6px 12px #6b21a8, -6px -6px 12px #a855f7;
+  .soft-neumorph-outset {
+    background: #16161D;
+    box-shadow: 6px 6px 12px #0a0a0d, 
+                -6px -6px 12px #22222d;
   }
 }
+
+/* Base masonry support outside layer for higher reliability */
+.masonry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-auto-rows: 20px;
+  gap: 20px;
+}
+
+.masonry-item-short { grid-row-end: span 14; min-height: 280px; }
+.masonry-item-tall { grid-row-end: span 22; min-height: 440px; }
+.masonry-item-med { grid-row-end: span 18; min-height: 360px; }

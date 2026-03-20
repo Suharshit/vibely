@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { cachedFetch, getCached } from "@/lib/fetchCache";
 
 export function formatBytes(bytes: number, decimals = 1) {
   if (!+bytes) return "0 Bytes";
@@ -12,22 +13,29 @@ export function formatBytes(bytes: number, decimals = 1) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
+const STATS_CACHE_KEY = "dashboard-stats";
+
 export function useDashboardStats() {
-  const [totalPhotos, setTotalPhotos] = useState(0);
-  const [totalBytes, setTotalBytes] = useState(0);
-  const [formattedSize, setFormattedSize] = useState("0 Bytes");
-  const [isLoading, setIsLoading] = useState(true);
+  const cached = getCached<{ totalPhotos: number; totalBytes: number }>(
+    STATS_CACHE_KEY
+  );
+  const [totalPhotos, setTotalPhotos] = useState(cached?.totalPhotos ?? 0);
+  const [totalBytes, setTotalBytes] = useState(cached?.totalBytes ?? 0);
+  const [formattedSize, setFormattedSize] = useState(
+    cached ? formatBytes(cached.totalBytes) : "0 Bytes"
+  );
+  const [isLoading, setIsLoading] = useState(!cached);
   const [error, setError] = useState<string | null>(null);
 
   const fetchStats = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/dashboard/stats");
-      if (!res.ok) {
-        throw new Error("Failed to fetch dashboard stats");
-      }
-      const data = await res.json();
+      const data = await cachedFetch(STATS_CACHE_KEY, async () => {
+        const res = await fetch("/api/dashboard/stats");
+        if (!res.ok) throw new Error("Failed to fetch dashboard stats");
+        return res.json();
+      });
       setTotalPhotos(data.totalPhotos || 0);
       setTotalBytes(data.totalBytes || 0);
       setFormattedSize(formatBytes(data.totalBytes || 0));

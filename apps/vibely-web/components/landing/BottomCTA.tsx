@@ -1,28 +1,30 @@
-// ============================================================
-// components/landing/BottomCTA.tsx
-// ============================================================
-// Final call to action section with a large neumorphic card
-// ============================================================
+"use client";
+
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 export function BottomCTA() {
+  const { isAuthenticated } = useAuth();
+
   return (
-    <section className="py-24 bg-neumorphic px-4 sm:px-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-neumorphic rounded-[3rem] p-12 sm:p-20 shadow-neumorphic border border-white/50 text-center">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
-            Ready to capture the vibe?
-          </h2>
-          <p className="text-gray-500 mb-10 max-w-lg mx-auto">
-            Join thousands of hosts making their events unforgettable.
-          </p>
-          <Link
-            href="/signup"
-            className="inline-flex items-center justify-center px-10 py-4 bg-neumorphic-purple text-white text-base font-semibold rounded-full shadow-neumorphic hover:shadow-neumorphic-sm hover:opacity-90 active:scale-95 transition-all"
-          >
-            Start My Free Event
-          </Link>
-        </div>
+    <section className="py-32 px-6">
+      <div className="max-w-4xl mx-auto relative rounded-3xl p-16 text-center overflow-hidden border border-primary/10 outline-3 outline-primary/80 hover:outline-primary/60 transition-all duration-300 shadow-lg shadow-primary/80">
+        <div className="absolute inset-0 bg-surface-container-high -z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 -z-10"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+        <h2 className="text-4xl md:text-5xl font-headline font-extrabold mb-8 tracking-tight text-on-surface">
+          Ready to capture the vibe?
+        </h2>
+        <p className="text-on-surface-variant text-lg mb-12 max-w-lg mx-auto">
+          Join thousands of hosts making their events unforgettable. Start your
+          first gallery in 30 seconds.
+        </p>
+        <Link
+          href={isAuthenticated ? "/events/create" : "/login"}
+          className="inline-block px-10 py-5 bg-gradient-to-r from-primary to-primary-dim text-on-primary-container font-bold rounded-2xl text-xl hover:scale-102 active:scale-98 transition-transform shadow-[0_20px_50px_rgba(189,157,255,0.2)]"
+        >
+          Create Your First Event — Free
+        </Link>
       </div>
     </section>
   );

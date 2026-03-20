@@ -2,14 +2,15 @@
 // apps/web/hooks/usePhotos.ts
 // ============================================================
 // Manages the full photo lifecycle:
-//   - Fetching paginated gallery
+//   - Fetching paginated gallery (with caching)
 //   - Initiating uploads (getting signed URL)
 //   - Tracking per-file upload progress
 //   - Completing uploads (activating photo record)
 //   - Deleting and saving/unsaving photos
 // ============================================================
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { cachedFetch, invalidateCache, getCached } from "@/lib/fetchCache";
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -63,49 +64,94 @@ interface UsePhotosReturn {
   unsavePhoto: (id: string) => Promise<void>;
 }
 
+// ── Upload concurrency limiter ────────────────────────────────
+const MAX_CONCURRENT_UPLOADS = 3;
+
+async function runWithConcurrency<T>(
+  tasks: (() => Promise<T>)[],
+  limit: number
+): Promise<T[]> {
+  const results: T[] = [];
+  let index = 0;
+
+  async function worker() {
+    while (index < tasks.length) {
+      const currentIndex = index++;
+      results[currentIndex] = await tasks[currentIndex]();
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(limit, tasks.length) }, () =>
+    worker()
+  );
+  await Promise.all(workers);
+  return results;
+}
+
 export function usePhotos(eventId: string): UsePhotosReturn {
-  const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
-  const [pagination, setPagination] = useState<Pagination | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const galleryCacheKey = useCallback(
+    (page: number) => `photos:${eventId}:${page}`,
+    [eventId]
+  );
+  const cached = getCached<{ photos: GalleryPhoto[]; pagination: Pagination }>(
+    galleryCacheKey(1)
+  );
+
+  const [photos, setPhotos] = useState<GalleryPhoto[]>(cached?.photos ?? []);
+  const [pagination, setPagination] = useState<Pagination | null>(
+    cached?.pagination ?? null
+  );
+  const [isLoading, setIsLoading] = useState(!cached);
   const [error, setError] = useState<string | null>(null);
   const [uploads, setUploads] = useState<UploadItem[]>([]);
+  const abortRef = useRef<AbortController | null>(null);
 
-  // ── Fetch gallery ─────────────────────────────────────────
+  // ── Fetch gallery (cached) ──────────────────────────────────
 
   const fetchPage = useCallback(
     async (page = 1) => {
+      // Abort any previous in-flight request
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       setIsLoading(true);
       setError(null);
       try {
-        const res = await fetch(
-          `/api/events/${eventId}/gallery?page=${page}&limit=20`
-        );
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error ?? "Failed to load gallery");
+        const key = galleryCacheKey(page);
+        const data = await cachedFetch(key, async () => {
+          const res = await fetch(
+            `/api/events/${eventId}/gallery?page=${page}&limit=20`,
+            { signal: controller.signal }
+          );
+          if (!res.ok) {
+            const json = await res.json();
+            throw new Error(json.error ?? "Failed to load gallery");
+          }
+          return res.json();
+        });
+        if (!controller.signal.aborted) {
+          setPhotos(data.photos ?? []);
+          setPagination(data.pagination);
         }
-        const data = await res.json();
-        setPhotos(data.photos ?? []);
-        setPagination(data.pagination);
       } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") return;
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
-        setIsLoading(false);
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
       }
     },
-    [eventId]
+    [eventId, galleryCacheKey]
   );
 
   useEffect(() => {
     if (eventId) fetchPage(1);
+    return () => abortRef.current?.abort();
   }, [eventId, fetchPage]);
 
-  // ── Upload pipeline ──────────────────────────────────────
-  // For each file:
-  //   1. POST /api/photos/upload → get signed URL + photo_id
-  //   2. PUT to signed URL with progress tracking (XMLHttpRequest)
-  //   3. POST /api/photos/:id/complete → activate the photo
-  //   4. Prepend to photos state so it appears immediately
+  // ── Upload pipeline (concurrency-limited) ───────────────────
 
   const uploadSingleFile = useCallback(
     async (
@@ -121,7 +167,6 @@ export function usePhotos(eventId: string): UsePhotosReturn {
       };
 
       try {
-        // Step 1: Get signed upload URL
         updateStatus({ status: "uploading", progress: 0 });
 
         const initRes = await fetch("/api/photos/upload", {
@@ -144,16 +189,12 @@ export function usePhotos(eventId: string): UsePhotosReturn {
         const { photo_id, upload_url } = await initRes.json();
         updateStatus({ photo_id });
 
-        // Step 2: Upload directly to Supabase Storage with progress
-        // WHY XMLHttpRequest instead of fetch?
-        // fetch() doesn't expose upload progress. XHR has onprogress
-        // for upload events — essential for showing progress bars.
         await new Promise<void>((resolve, reject) => {
           const xhr = new XMLHttpRequest();
 
           xhr.upload.onprogress = (e) => {
             if (e.lengthComputable) {
-              const pct = Math.round((e.loaded / e.total) * 90); // cap at 90% until complete
+              const pct = Math.round((e.loaded / e.total) * 90);
               updateStatus({ progress: pct });
             }
           };
@@ -171,11 +212,10 @@ export function usePhotos(eventId: string): UsePhotosReturn {
 
           xhr.open("PUT", upload_url);
           xhr.setRequestHeader("Content-Type", file.type);
-          xhr.timeout = 120_000; // 2 minutes
+          xhr.timeout = 120_000;
           xhr.send(file);
         });
 
-        // Step 3: Activate the photo record
         updateStatus({ status: "completing", progress: 95 });
 
         const completeRes = await fetch(`/api/photos/${photo_id}/complete`, {
@@ -189,10 +229,12 @@ export function usePhotos(eventId: string): UsePhotosReturn {
         const { photo: activatedPhoto } = await completeRes.json();
         updateStatus({ status: "done", progress: 100 });
 
-        // Step 4: Prepend the new photo to the gallery
         if (activatedPhoto) {
           setPhotos((prev) => [activatedPhoto, ...prev]);
         }
+
+        // Invalidate gallery cache so next visit gets fresh data
+        invalidateCache(galleryCacheKey(1));
       } catch (err) {
         updateStatus({
           status: "error",
@@ -200,12 +242,11 @@ export function usePhotos(eventId: string): UsePhotosReturn {
         });
       }
     },
-    []
+    [galleryCacheKey]
   );
 
   const uploadFiles = useCallback(
     async (files: File[], eventId: string, guestToken?: string) => {
-      // Initialize upload items for all files
       const newUploads: UploadItem[] = files.map((file) => ({
         id: crypto.randomUUID(),
         file,
@@ -213,34 +254,35 @@ export function usePhotos(eventId: string): UsePhotosReturn {
         progress: 0,
       }));
 
-      // Append upload rows (pure updater, no side effects)
       setUploads((prev) => [...prev, ...newUploads]);
 
-      // Start uploads outside setState updater. In React Strict Mode,
-      // updater functions can run twice in development; side effects here
-      // would duplicate uploads/photos.
-      await Promise.all(
-        newUploads.map((item) =>
+      // Run uploads with concurrency limit instead of Promise.all
+      const tasks = newUploads.map(
+        (item) => () =>
           uploadSingleFile(item.file, eventId, item.id, guestToken)
-        )
       );
+      await runWithConcurrency(tasks, MAX_CONCURRENT_UPLOADS);
     },
     [uploadSingleFile]
   );
 
   // ── Delete ───────────────────────────────────────────────
 
-  const deletePhoto = useCallback(async (id: string) => {
-    try {
-      const res = await fetch(`/api/photos/${id}`, { method: "DELETE" });
-      const data = await res.json();
-      if (!res.ok) return { success: false, error: data.error };
-      setPhotos((prev) => prev.filter((p) => p.id !== id));
-      return { success: true };
-    } catch {
-      return { success: false, error: "Network error" };
-    }
-  }, []);
+  const deletePhoto = useCallback(
+    async (id: string) => {
+      try {
+        const res = await fetch(`/api/photos/${id}`, { method: "DELETE" });
+        const data = await res.json();
+        if (!res.ok) return { success: false, error: data.error };
+        setPhotos((prev) => prev.filter((p) => p.id !== id));
+        invalidateCache(galleryCacheKey(1));
+        return { success: true };
+      } catch {
+        return { success: false, error: "Network error" };
+      }
+    },
+    [galleryCacheKey]
+  );
 
   // ── Save / Unsave ────────────────────────────────────────
 

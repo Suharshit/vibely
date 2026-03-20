@@ -1,98 +1,74 @@
-import Image from "next/image";
 import Link from "next/link";
-
-// interface EventTag {
-//   label: string;
-// }
+import { isEventExpired } from "@shared/utils/invite";
+import EventMemberStack from "./EventMemberStack";
 
 interface EventCardProps {
   id: string;
   title: string;
-  dateStr: string;
-  description: string;
-  imageUrl: string;
-  status: "ACTIVE" | "EXPIRED";
-  tags: string[]; // Simplest format as string array
+  event_date: string;
+  description?: string | null;
+  cover_image_url?: string | null;
+  status: string;
+  expires_at?: string | null;
 }
 
 export default function EventCard({
   id,
   title,
-  dateStr,
-  description,
-  imageUrl,
+  event_date,
+  // description,
+  cover_image_url,
   status,
-  // tags,
+  expires_at,
 }: EventCardProps) {
-  const isExpired = status === "EXPIRED";
+  const expired = isEventExpired(expires_at || "") || status !== "active";
+  const coverImg =
+    cover_image_url ||
+    "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop";
 
   return (
     <Link
       href={`/events/${id}`}
-      className="group relative block w-full aspect-[1/2] sm:aspect-auto sm:h-[480px] rounded-[32px] overflow-hidden bg-gray-900 shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+      className="group relative h-96 rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-primary/20 border border-white/5"
     >
-      {/* Background Image */}
-      <Image
-        src={imageUrl}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         alt={title}
-        fill
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-        className="object-cover transition-transform duration-700 group-hover:scale-105"
+        src={coverImg}
       />
 
-      {/* Gradient Overlay for Text Visibility */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 pointer-events-none" />
+      {/* Glassy Overlay Container */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-6">
+        <div className="absolute top-4 right-4 bg-white/10 backdrop-blur-xl px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-white border border-white/20">
+          {expired ? "Archived" : "Live"}
+        </div>
 
-      {/* Content Container */}
-      <div className="absolute inset-0 p-6 flex flex-col pointer-events-none">
-        {/* Top: Status Badges & Basic Info could go here, but design has it lower */}
-
-        {/* Bottom portion */}
-        <div className="mt-auto flex flex-col gap-2">
-          {/* Header Row: Title & Status Badge */}
-          <div className="flex justify-between items-center gap-2">
-            <h2 className="text-[28px] font-bold text-white tracking-tight drop-shadow-sm line-clamp-2 leading-tight">
-              {title}
-            </h2>
-            <div
-              className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase flex-shrink-0 backdrop-blur-md border border-white/20 shadow-sm
-                ${isExpired ? "bg-white/10 text-white/80" : "bg-white/20 text-white"}
-              `}
-            >
-              {status}
-            </div>
+        {/* Event Details - Glassmorphic Card Style */}
+        <div className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-2xl p-5 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+          <h4 className="text-xl font-bold font-headline text-white mb-1 truncate">
+            {title}
+          </h4>
+          <div className="flex items-center gap-2 text-white/60 mb-4">
+            <span className="material-symbols-outlined text-sm">
+              calendar_today
+            </span>
+            <p className="text-[10px] font-label uppercase tracking-widest truncate">
+              {new Date(event_date).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </p>
           </div>
 
-          <p className="text-white/90 text-sm font-medium">{dateStr}</p>
-
-          <p className="text-gray-300 text-sm line-clamp-2 leading-relaxed font-light mt-1">
-            {description}
-          </p>
-
-          {/* TODO Add Tags logics */}
-          {/* Tags
-          <div className="flex flex-wrap gap-2 mt-2">
-            {tags.map((tag, idx) => (
-              <span
-                key={idx}
-                className="px-3 py-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-full text-xs font-medium text-gray-200"
-              >
-                {tag}
+          <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-auto">
+            <EventMemberStack eventId={id} />
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary-container shadow-lg shadow-primary/20">
+              <span className="material-symbols-outlined text-sm">
+                arrow_forward
               </span>
-            ))}
-          </div> */}
-
-          {/* Action Button */}
-          <div className="mt-6 pointer-events-auto">
-            {isExpired ? (
-              <span className="w-full py-4 px-6 rounded-full font-bold text-sm bg-[#222222] hover:bg-[#1a1a1a] text-white border border-white/10 transition-colors shadow-lg flex items-center justify-center cursor-pointer">
-                View Archive
-              </span>
-            ) : (
-              <span className="w-full py-4 px-6 rounded-full font-bold text-sm bg-white hover:bg-gray-50 text-gray-900 border border-transparent hover:border-gray-200 transition-colors shadow-xl flex items-center justify-center gap-2 group-hover:scale-[1.02] cursor-pointer">
-                View Vault
-              </span>
-            )}
+            </div>
           </div>
         </div>
       </div>

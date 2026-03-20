@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
   // domains is deprecated in Next.js 13+. remotePatterns is more
   // specific — you can restrict to exact hostnames and path prefixes.
   images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 86400, // 24 hours
     remotePatterns: [
       {
         // ImageKit CDN
@@ -25,6 +27,11 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
         pathname: "/**",
       },
     ],

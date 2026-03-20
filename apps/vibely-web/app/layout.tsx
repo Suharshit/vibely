@@ -3,17 +3,22 @@
 // ============================================================
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/layout/Toast";
 import { AuthProvider } from "@/context/AuthContext";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-jakarta",
+  weight: ["400", "500", "600", "700", "800"],
+});
 
 export const metadata: Metadata = {
-  title: "Vibely — Share event photos instantly",
+  title: "Vibely — Your Memories, Shared Beautifully.",
   description:
-    "Create events, share a QR code, and collect photos from everyone — no app required for guests.",
+    "Vibely is the digital keepsake for your modern events. High-fidelity guest uploads without the friction of app downloads or account creation.",
   openGraph: {
     title: "Vibely",
     description: "Share event photos instantly — no app required for guests.",
@@ -27,14 +32,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
+      <head>
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+          rel="stylesheet"
+        />
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+          .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+          }
+        `,
+          }}
+        />
+      </head>
       <body
-        className={`${inter.className} bg-gray-50 text-gray-900 antialiased`}
+        className={`${inter.variable} ${plusJakartaSans.variable} bg-background text-on-surface font-body selection:bg-primary/30`}
       >
         <AuthProvider>
-          <ToastProvider>
-            <main className="bg-[#F0F2f5]">{children}</main>
-          </ToastProvider>
+          <ToastProvider>{children}</ToastProvider>
         </AuthProvider>
       </body>
     </html>
